@@ -56,8 +56,34 @@ int RecordManager::indexDrop(string indexName)
 	return 1;  //删除成功
 }
 
-
-
+int RecordManager::insertRecord(string tableName, char* record, int recordSize)
+{
+	return 1;
+}  //插入记录,返回值是存在第几个块里，如果返回0说明插入失败  
+    
+    int RecordManager::showClearRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector, int in){
+    	return 1;
+    } //精确查找，in是index返回的块号
+   //无索引查找
+    int RecordManager::showRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector){
+    	return 1;
+    } //bn是这个表有几个块，输出所有符合条件的记录,返回值是记录数量
+    
+    //返回记录条数
+    int RecordManager::searchRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector){
+    	return 1;}
+    //删除记录
+    int RecordManager::deleteRecord(string tableName,int recordSize, int bn,vector<Attribute> &attributeVector,vector<Condition> &conditionVector)
+    { return 1;}  //删除符合条件的记录
+    //插入索引
+    int RecordManager::insertNewIndex(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,int i ){
+    	return 1;
+    }
+    //更新记录
+    int RecordManager::updateRecord(string tabaleName,int recordSize, vector<Condition> &conditionVector){
+    	return 1;
+    }
+/*
 //insert a record 插入功能
 int RecordManager::insertRecord(string tableName, char* record, int recordSize)
 {
@@ -75,7 +101,7 @@ int RecordManager::insertRecord(string tableName, char* record, int recordSize)
 		if (bm.bufferPool[pos].content[use] != no_empty)
 		{
 			bm.bufferPool[pos].content[use] = no_empty;
-			memcpy(&bm.bufferPool[pos].content[use+1], record, recordSize);  //存入record
+			memcpy(bm.bufferPool[pos].content[use+1], record, recordSize);  //存入record
 			break;
 		}
 		use = use + 1 + recordSize;
@@ -86,7 +112,7 @@ int RecordManager::insertRecord(string tableName, char* record, int recordSize)
 }
 
 
-/*
+
 int RecordManager::showClearRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector, int in)  //bn是该table下的block数量，catelog提供
 {
 
@@ -237,11 +263,11 @@ int RecordManager::deleteBlockRecord(int recordSize, int num, vector<Attribute> 
 
 
 
-*//*
+*/
 //私函数 判断是否满足条件
-int RecordManager::ifCondition(char* recordBegin, int recordSize, vector<Attribute> &attributeVector,vector<Condition> &conditionVector)
+/*int RecordManager::ifCondition(char* recordBegin, int recordSize, vector<Attribute> &attributeVector,vector<Condition> &conditionVector)
 {
-    if (conditionVector.size() == 0) 
+    if (conditionVector == NULL) 
         return 1;
     
     int type;
@@ -276,9 +302,9 @@ int RecordManager::ifCondition(char* recordBegin, int recordSize, vector<Attribu
 
         for(int j = 0; j < conditionVector.size(); j++)
         {
-            if (conditionVector[j].Attribute_Name == attributeName)
+            if (conditionVector[j].attributeName == attributeName)
             {
-                if(!conditionVector[j].judge(tmp))
+                if(!conditionVector[j].judege(tmp))
                  	return 0;
             }
         }
@@ -360,7 +386,7 @@ int RecordManager::insertNewIndex(string tableName, int recordSize, int bn, vect
 	}
 	return c;
 }
-
+*/
 /*int RecordManager::insertNewBlockIndex(string indexName, int recordSize, int num, vector<Attribute> &attributeVector,vector<Condition> &conditionVector)
 {
 	int use = 0;
