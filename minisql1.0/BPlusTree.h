@@ -83,7 +83,7 @@ public:
 	string BPlusTree_name;
 
 	BPlusTree();
-	BPlusTree(string Name, int KeySize, int KeyType, int Degree);
+	BPlusTree(string Name, int KeySize, int Key_Type, int Degree);
 	~BPlusTree();
 	
 	void Parse_Index(char * BlockContent);
@@ -150,7 +150,7 @@ void GetIndexHead(BPlusTree<KeyType> * BPT)
 
 
 template <class KeyType>
-int Node<KeyType>::Search_In_Node(KeyType Key)
+int Node<KeyType>::Search_In_Node(KeyType key)
 {
 
 	if (key_num == 0)
@@ -588,11 +588,11 @@ BPlusTree<KeyType>::BPlusTree()
 }
 
 template <class KeyType>
-BPlusTree<KeyType>::BPlusTree(string Name, int KeySize, int KeyType, int Degree)
+BPlusTree<KeyType>::BPlusTree(string Name, int KeySize, int Key_Type, int Degree)
 {
 	BPlusTree_name = Name;
 	key_size = KeySize;
-	key_type = KeyType;
+	key_type = Key_Type;
 	degree = Degree;
 	root = 1;
 	LeafHead = 1;
@@ -609,7 +609,7 @@ BPlusTree<KeyType>::~BPlusTree()
 /**/
 
 template <class KeyType>
-bool Node<KeyType>::Delete_from_Node(KeyType Key)
+bool Node<KeyType>::Delete_from_Node(KeyType key)
 {
 	IndexType pos;
 	bool IsFind = Search_In_Node_For_Delete(key, pos);
