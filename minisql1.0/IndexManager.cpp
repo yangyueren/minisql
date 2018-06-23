@@ -12,17 +12,17 @@ IndexManager::~IndexManager()
 
 }
 
-bool IndexManager::GetIndex(string IndexName, int KeyType)
+bool IndexManager::GetIndex(string IndexName, int Key_Type)
 {
 	struct Index temp_index;
 
-	temp_index.Type = KeyType;
+	temp_index.Type = Key_Type;
 	temp_index.IndexFileName = IndexName;
-	if(KeyType == INT_TYPE)
+	if(Key_Type == INT_TYPE)
 		GetIndexHead(&temp_index.B_Plus_Tree_int);
-	else if(KeyType == FLOAT_TYPE)
+	else if(Key_Type == FLOAT_TYPE)
 		GetIndexHead(&temp_index.B_Plus_Tree_float);
-	else if(KeyType == STRING_TYPE)
+	else if(Key_Type == STRING_TYPE)
 		GetIndexHead(&temp_index.B_Plus_Tree_string);
 	else
 		return false;
@@ -59,12 +59,13 @@ bool IndexManager::DeleteIndex(string IndexName)
 	}
 }
 
-bool IndexManager::CreateIndex(string IndexName, int KeySize, int KeyType, int Degree)
+bool IndexManager::CreateIndex(string IndexName, int KeySize, int Key_Type, int Degree)
 {
 	
-	if(KeyType == INT_TYPE)
+	if(Key_Type == INT_TYPE)
 	{
-		BPlusTree<int> BPT(IndexName, KeySize, KeyType, Degree);
+		BPlusTree<int> BPT(IndexName, KeySize, Key_Type, Degree);
+		//UpdateIndex(&BPT);
 		BPT.LeafHead = BPT.root = createNewBlock(IndexName);
 		UpdateIndex(&BPT);
 		Node<int> node(KeySize);
@@ -73,9 +74,9 @@ bool IndexManager::CreateIndex(string IndexName, int KeySize, int KeyType, int D
 		node.IsLeaf = true;
 		BPT.UpdateNode(node, node.Self);
 	}
-	else if(KeyType == FLOAT_TYPE)
+	else if(Key_Type == FLOAT_TYPE)
 	{
-		BPlusTree<float> BPT(IndexName, KeySize, KeyType, Degree);
+		BPlusTree<float> BPT(IndexName, KeySize, Key_Type, Degree);
 		BPT.LeafHead = BPT.root = createNewBlock(IndexName);
 		UpdateIndex(&BPT);
 		Node<float> node(KeySize);
@@ -84,9 +85,9 @@ bool IndexManager::CreateIndex(string IndexName, int KeySize, int KeyType, int D
 		node.IsLeaf = true;
 		BPT.UpdateNode(node, node.Self);
 	}
-	else if(KeyType == STRING_TYPE)
+	else if(Key_Type == STRING_TYPE)
 	{
-		BPlusTree<string> BPT(IndexName, KeySize, KeyType, Degree);
+		BPlusTree<string> BPT(IndexName, KeySize, Key_Type, Degree);
 		BPT.LeafHead = BPT.root = createNewBlock(IndexName);
 		UpdateIndex(&BPT);
 		Node<string> node(KeySize);
@@ -102,16 +103,16 @@ bool IndexManager::CreateIndex(string IndexName, int KeySize, int KeyType, int D
 }
 
 
-bool IndexManager::CreateIndex(string IndexName, int KeySize, int KeyType)
+bool IndexManager::CreateIndex(string IndexName, int KeySize, int Key_Type)
 {
 	int Degree;
 
 	Degree = 4000/KeySize;
-	return CreateIndex(IndexName, KeySize, KeyType, Degree);
+	return CreateIndex(IndexName, KeySize, Key_Type, Degree);
 }
 
 
-OffsetType IndexManager::SearchInIndex(string IndexName, string KeyValue, int KeyType)
+OffsetType IndexManager::SearchInIndex(string IndexName, string KeyValue, int Key_Type)
 {
 	int i;
 	int index = -1;
@@ -120,7 +121,7 @@ OffsetType IndexManager::SearchInIndex(string IndexName, string KeyValue, int Ke
 	bool exist = false;
 	if (IndexSet[0].IndexFileName != IndexName)
 	{
-		GetIndex(IndexName, KeyType);
+		GetIndex(IndexName, Key_Type);
 	}
 	
 
@@ -138,21 +139,21 @@ OffsetType IndexManager::SearchInIndex(string IndexName, string KeyValue, int Ke
 	}
 	else
 	{
-		if(KeyType == INT_TYPE)
+		if(Key_Type == INT_TYPE)
 		{
 			exist = IndexSet[i].B_Plus_Tree_int.Search(stoi(KeyValue), offset);
 			Node<int> node;
 			IndexSet[i].B_Plus_Tree_int.GetNode(node, offset);
 			data_offset = IndexSet[i].B_Plus_Tree_int.Get_Data_Address(stoi(KeyValue), node);
 		}
-		else if(KeyType == FLOAT_TYPE)
+		else if(Key_Type == FLOAT_TYPE)
 		{
 			exist = IndexSet[i].B_Plus_Tree_float.Search(stof(KeyValue), offset);
 			Node<float> node;
 			IndexSet[i].B_Plus_Tree_float.GetNode(node, offset);
 			data_offset = IndexSet[i].B_Plus_Tree_float.Get_Data_Address(stof(KeyValue), node);
 		}
-		else if(KeyType == STRING_TYPE)
+		else if(Key_Type == STRING_TYPE)
 		{
 			exist = IndexSet[i].B_Plus_Tree_string.Search(KeyValue, offset);
 			Node<string> node;
@@ -169,7 +170,7 @@ OffsetType IndexManager::SearchInIndex(string IndexName, string KeyValue, int Ke
 		return -1;
 }
 
-bool IndexManager::InsertIntoIndex(string IndexName, string KeyValue, int KeyType, OffsetType Offset)
+bool IndexManager::InsertIntoIndex(string IndexName, string KeyValue, int Key_Type, OffsetType Offset)
 {
 	int i;
 	int index = -1;
@@ -178,7 +179,7 @@ bool IndexManager::InsertIntoIndex(string IndexName, string KeyValue, int KeyTyp
 	//OffsetType offset;
 	if (IndexSet[0].IndexFileName != IndexName)
 	{
-		GetIndex(IndexName, KeyType);
+		GetIndex(IndexName, Key_Type);
 	}
 
 	for(i=0; i<IndexNum; i++)
@@ -188,11 +189,11 @@ bool IndexManager::InsertIntoIndex(string IndexName, string KeyValue, int KeyTyp
 			break;
 		}
 
-	if(KeyType == INT_TYPE)
+	if(Key_Type == INT_TYPE)
 		succeed = IndexSet[i].B_Plus_Tree_int.Insert(stoi(KeyValue), Offset);
-	else if(KeyType == FLOAT_TYPE)
+	else if(Key_Type == FLOAT_TYPE)
 		succeed = IndexSet[i].B_Plus_Tree_float.Insert(stof(KeyValue), Offset);
-	else if(KeyType == STRING_TYPE)
+	else if(Key_Type == STRING_TYPE)
 		succeed = IndexSet[i].B_Plus_Tree_string.Insert(KeyValue, Offset);
 	else
 		succeed = false;
@@ -205,7 +206,7 @@ bool IndexManager::InsertIntoIndex(string IndexName, string KeyValue, int KeyTyp
 
 
 
-bool IndexManager::DeleteInIndex(string IndexName, string KeyValue, int KeyType)
+bool IndexManager::DeleteInIndex(string IndexName, string KeyValue, int Key_Type)
 {
 	int i;
 	int index = -1;
@@ -214,7 +215,7 @@ bool IndexManager::DeleteInIndex(string IndexName, string KeyValue, int KeyType)
 	bool exist = false;
 	if (IndexSet[0].IndexFileName != IndexName)
 	{
-		GetIndex(IndexName, KeyType);
+		GetIndex(IndexName, Key_Type);
 	}
 
 	for(i=0; i<IndexNum; i++)
@@ -231,21 +232,21 @@ bool IndexManager::DeleteInIndex(string IndexName, string KeyValue, int KeyType)
 	}
 	else
 	{
-		if(KeyType == INT_TYPE)
+		if(Key_Type == INT_TYPE)
 			exist = IndexSet[i].B_Plus_Tree_int.Search(stoi(KeyValue), offset);
-		else if(KeyType == FLOAT_TYPE)
+		else if(Key_Type == FLOAT_TYPE)
 			exist = IndexSet[i].B_Plus_Tree_float.Search(stof(KeyValue), offset);
-		else if(KeyType == STRING_TYPE)
+		else if(Key_Type == STRING_TYPE)
 			exist = IndexSet[i].B_Plus_Tree_string.Search(KeyValue, offset);
 		else
 			exist = false;
 	}	
 	*/
-	if(KeyType == INT_TYPE)
+	if(Key_Type == INT_TYPE)
 		succeed = IndexSet[i].B_Plus_Tree_int.Delete(stoi(KeyValue));
-	else if(KeyType == FLOAT_TYPE)
+	else if(Key_Type == FLOAT_TYPE)
 		succeed = IndexSet[i].B_Plus_Tree_float.Delete(stof(KeyValue));
-	else if(KeyType == STRING_TYPE)
+	else if(Key_Type == STRING_TYPE)
 		succeed = IndexSet[i].B_Plus_Tree_string.Delete(KeyValue);
 	else
 		succeed = false;

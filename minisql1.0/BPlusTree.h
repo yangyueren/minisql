@@ -4,7 +4,6 @@
 
 #define __BplusTree__
 
-
 #include <vector>
 #include <stdio.h>
 #include <cstring>
@@ -62,7 +61,7 @@ public:
 	int Search_In_Node(KeyType Key);
 	int Search_In_Node_exact(KeyType key);
 	int Find_Data_Offset(KeyType key);
-	bool Delete_from_Node(KeyType Key);
+	bool Delete_from_Node(KeyType key);
 	int Insert_Into_Node(KeyType Key, OffsetType DataOffset);
 	int Insert_Into_Node(KeyType Key);
 
@@ -150,7 +149,7 @@ void GetIndexHead(BPlusTree<KeyType> * BPT)
 
 
 template <class KeyType>
-int Node<KeyType>::Search_In_Node(KeyType key)
+int Node<KeyType>::Search_In_Node(KeyType Key)
 {
 
 	if (key_num == 0)
@@ -634,7 +633,7 @@ bool Node<KeyType>::Delete_from_Node(KeyType key)
 	}
 	else
 	{
-		cout << "The key is not in the list." << endl;
+		//cout << "The key is not in the list." << endl;
 		return false;
 	}
 }

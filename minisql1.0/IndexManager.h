@@ -43,9 +43,9 @@ private:
 /*
 bool CreateIndex(string IndexName, int KeySize, int Key_Type);//int float   传入一个索引名（实际为文件名）、建索引的值得大小、建索引的值的类型，创建一个空索引，成功返回true，否则返回false
 bool CreateIndex(string IndexName, int KeySize, int Key_Type, int Degree);// string   传入一个索引名（实际为文件名）、建索引的值得大小、建索引的值的类型、树的degree是char的长度，创建一个空索引，成功返回true，否则返回false
-OffsetType SearchInIndex(string indexName,  key, Key_Type)           //-1代表没有
-bool InsertIntoIndex(string indexName, key, Key_Type, OffsetType Offset)// 
-bool DeleteInIndex(string indexName, key, Key_Type);
+OffsetType SearchInIndex(string indexName,  key, keytype)           //-1代表没有
+bool InsertIntoIndex(string indexName, key, keytype, OffsetType Offset)// 
+bool DeleteInIndex(string indexName, key, keytype);
 bool DeleteIndex(string IndexName);//在传入删除的索引文件名，在内存中删除索引头
 
 */
