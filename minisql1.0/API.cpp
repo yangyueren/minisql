@@ -141,7 +141,7 @@ void API::drop_index(string index_name)
 		// 删除索引信息
 		catalog_manager->dropIndex(index_name);
 		// index 删除索引树
-		string index_file_name = "Index_file" + index_name;
+		string index_file_name = index_file_name_get(index_name);
 		index_manager->DeleteIndex(index_file_name); // 删除树
 	}
 }
@@ -363,7 +363,7 @@ void API::attribute_print(vector<Attribute> &attribute_vector)
 }
 string API::index_file_name_get(string index_name)
 {
-	return "Index_file" + index_name;
+	return "IndexFile_" + index_name;
 }
 bool API::check_table(string table_name)
 {
