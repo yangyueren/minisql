@@ -4,12 +4,13 @@
 #include <string>
 #include "Condition.hpp"
 #include "Attribute.hpp"
-// #include "//api.h"
+#include "api.h"
 typedef unsigned int u_int;
 using namespace std;
 class Interpreter
 {
 public:
+	API *api;
 	string file_name;
 	int interpreter(string s);
 	Interpreter(){}
@@ -170,8 +171,10 @@ int Interpreter::interpreter(string s)
 					Attribute col(attribute_name, type, unique);
 					attribute_vector.push_back(col);
 					if(word.compare(",") != 0){
-						if(word.compare(")") == 0) // create table done
-							return 0;
+						if(word.compare(")") == 0){ // create table done
+							api->create_table(table_name, attribute_vector, primary_key_location);
+							return 1;
+						}
 						else{
 							cout << "Syntax Error: You may miss ," << endl;
 							return 0;
@@ -190,7 +193,7 @@ int Interpreter::interpreter(string s)
 								word = split(s, cur);
 								primary_key = word;
 								if(is_primary_key == false){
-									int i = 0;
+									int i;
 									for(i = 0; i < attribute_vector.size(); i++){
 										if(attribute_vector[i].name == primary_key){
 											attribute_vector[i].unique = true;
@@ -214,7 +217,7 @@ int Interpreter::interpreter(string s)
 									return 0;
 								}
 								// for test print(table_name, attribute_vector, primary_key_location);
-								//api->create_table(table_name, &attribute_vector, primary_key_location);
+								api->create_table(table_name, attribute_vector, primary_key_location);
 								return 1;
 							}
 						}
@@ -250,7 +253,7 @@ int Interpreter::interpreter(string s)
 								}
 								else{
 									create_index_print(index_name, table_name, attribute_name);
-									//api->create_index(index_name, table_name, attribute_name);
+									api->create_index(index_name, table_name, attribute_name);
 									return 1;
 								}
 							}
@@ -291,7 +294,7 @@ int Interpreter::interpreter(string s)
 			if(word.length() != 0){ // table name
 				table_name = word;
 				drop_table_print(table_name);
-				//api->drop_table(table_name);
+				api->drop_table(table_name);
 				return 1;
 			} 
 			else{
@@ -306,7 +309,7 @@ int Interpreter::interpreter(string s)
 			if(word.length() != 0){
 				index_name = word;
 				drop_index_print(index_name);
-				//api->drop_index(index_name);
+				api->drop_index(index_name);
 				return 1;
 			}
 			else{
@@ -376,12 +379,12 @@ int Interpreter::interpreter(string s)
 							return 0;
 						}
 						record_show_print(table_name, condition_vector);
-						//api->record_show(table_name, &condition_vector);
+						api->record_show(table_name, condition_vector);
 						return 1;
 					}
 					else if(word.length() == 0){ // select all
 						vector<Condition> condition_vector;
-						//api->record_show(table_name, condition_vector);
+						api->record_show(table_name, condition_vector);
 						return 1;
 					}
 					else{
@@ -437,7 +440,7 @@ int Interpreter::interpreter(string s)
 							}
 						}
 						record_insert_print(table_name, value_vector);
-						//api->record(table_name, &value_vector);
+						api->record(table_name, &value_vector);
 						return 1;
 					}
 					else{
@@ -467,7 +470,7 @@ int Interpreter::interpreter(string s)
 				word = split(s, cur); // "" or where or error
 				if(word.length() == 0){
 					vector<Condition> condition_vector;
-					//api->record_delete(table_name, condition_vector);
+					api->record_delete(table_name, condition_vector);
 					return 1;
 				}
 				else if(word == "where"){
@@ -512,7 +515,7 @@ int Interpreter::interpreter(string s)
 								word = split(s, cur);
 						}
 						record_delete_print(table_name, condition_vector);
-						//api->record_delete(table_name, &condition_vector);
+						api->record_delete(table_name, condition_vector);
 						return 1;
 					}		
 					else{
@@ -588,7 +591,7 @@ int Interpreter::interpreter(string s)
 											word = split(s, cur);
 									}
 									update_print(table_name, attribute_name, new_value, condition_vector);
-									//api->record_show(table_name, &condition_vector);
+									api->record_show(table_name, condition_vector);
 								return 1;
 								}
 								else{ // error
