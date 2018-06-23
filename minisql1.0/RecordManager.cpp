@@ -75,7 +75,7 @@ int RecordManager::insertRecord(string tableName, char* record, int recordSize)
 		if (bm.bufferPool[pos].content[use] != no_empty)
 		{
 			bm.bufferPool[pos].content[use] = no_empty;
-			memcpy(bm.bufferPool[pos].content[use+1], record, recordSize);  //存入record
+			memcpy(&bm.bufferPool[pos].content[use+1], record, recordSize);  //存入record
 			break;
 		}
 		use = use + 1 + recordSize;
@@ -86,6 +86,7 @@ int RecordManager::insertRecord(string tableName, char* record, int recordSize)
 }
 
 
+/*
 int RecordManager::showClearRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector, int in)  //bn是该table下的block数量，catelog提供
 {
 
