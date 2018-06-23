@@ -5,6 +5,10 @@ using namespace std;
 IndexManager::IndexManager()
 {
 	IndexNum = 1;
+	struct Index temp;
+	temp.IndexFileName = "";
+	temp.Type = -1;
+	IndexSet.push_back(struct Index());
 }
 
 IndexManager::~IndexManager()
@@ -54,7 +58,7 @@ bool IndexManager::DeleteIndex(string IndexName)
 	{
 		IndexSet.erase(IndexSet.begin()+index);
 		//IndexNum--;
-		cout<<"Index "<<IndexName<<" has been deleted!"<<endl;
+		//cout<<"Index "<<IndexName<<" has been deleted!"<<endl;
 		return true;
 	}
 }
@@ -65,7 +69,8 @@ bool IndexManager::CreateIndex(string IndexName, int KeySize, int Key_Type, int 
 	if(Key_Type == INT_TYPE)
 	{
 		BPlusTree<int> BPT(IndexName, KeySize, Key_Type, Degree);
-		//UpdateIndex(&BPT);
+		createNewBlock(IndexName);
+		UpdateIndex(&BPT);
 		BPT.LeafHead = BPT.root = createNewBlock(IndexName);
 		UpdateIndex(&BPT);
 		Node<int> node(KeySize);
@@ -107,7 +112,8 @@ bool IndexManager::CreateIndex(string IndexName, int KeySize, int Key_Type)
 {
 	int Degree;
 
-	Degree = 4000/KeySize;
+	//Degree = 500/KeySize;
+	Degree = 5;
 	return CreateIndex(IndexName, KeySize, Key_Type, Degree);
 }
 
@@ -252,4 +258,19 @@ bool IndexManager::DeleteInIndex(string IndexName, string KeyValue, int Key_Type
 		succeed = false;
 	
 	return succeed;
+}
+
+/********************************/
+void IndexManager::levelListIndex(string IndexName)
+{
+	int i = 0;
+	int index = 0;
+	for (i = 0; i<IndexNum; i++)
+		if (IndexName == IndexSet[i].IndexFileName)
+		{
+			index = i;
+			break;
+		}
+	IndexSet[i].B_Plus_Tree_int.Level_List();
+
 }
