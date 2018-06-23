@@ -63,7 +63,7 @@ int RecordManager::insertRecord(string tableName, char* record, int recordSize)
 
 	//ask buffer the position
 	string filename = "TableFile_" + tableName;
-	int pos = bm.getInsertPosition(filename，recordSize);    
+	int pos = bm.getInsertPosition(filename，recordSize + 1);    
 
 	//write record in
 	int use = 0;
@@ -82,7 +82,6 @@ int RecordManager::insertRecord(string tableName, char* record, int recordSize)
 
 	return pos; //insert is successful, 返回块号
 }
-
 
 
 
@@ -134,7 +133,7 @@ int RecordManager::showBlockRecord(int recordSize, int num, vector<Attribute> &a
 		{
 			if (ifCondition(use, recordSize, attributeVector, conditionVector))
 			{
-				printRecord(bm.bufferPool[num].content[use+1], recordSize);
+				printRecord(bm.bufferPool[num].content[use+1], recordSize, attributeVector);
 				count++;
 			}				
 		}
@@ -286,7 +285,7 @@ int RecordManager::ifCondition(char* recordBegin,int recordSize, vector<Attribut
     }
     return 1;
 }
-
+*/
 
 //私函数 输出该条语句
 void RecordManager::printRecord(char* recordBegin, int recordSize, vector<Attribute> &attributeVector) //print this record

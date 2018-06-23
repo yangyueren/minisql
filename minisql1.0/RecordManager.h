@@ -1,10 +1,10 @@
 #ifndef RECORDMANAGER_H
 #define RECORDMANAGER_H
 
-//#include "Condition.hpp"
-//#include "Attribute.hpp"
+#include "Condition.hpp"
+#include "Attribute.hpp"
 #include "RecordManager.h"
-//#include "BufferManager.h"
+#include "BufferManager.h"
 #include <string>
 #include <vector>
 using namespace std;
@@ -13,7 +13,7 @@ using namespace std;
 class RecordManager{
 public:
 	RecordManager(){};
-    //BufferManager bm;
+    BufferManager bm;
     
     int tableCreate(string tableName);  //创建表
     int tableDrop(string tableName);  //删除表   
