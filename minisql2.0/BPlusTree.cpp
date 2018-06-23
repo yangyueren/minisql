@@ -351,7 +351,7 @@ void Inver_ParseNode(char * BlockContent, Node<string> & TreeNode)
 	}
 	for (i = 0; i<TreeNode.key_num; i++, j++)
 	{
-		strcpy(temp_key, TreeNode.KeySet[i].c_str()); //若为string, 则需要注意一下！！！！！
+		strcpy_s(temp_key, TreeNode.KeySet[i].c_str()); //若为string, 则需要注意一下！！！！！
 		memcpy(BlockContent + UsingSize, temp_key, TreeNode.key_size);
 		UsingSize += TreeNode.key_size;
 		temp.integer = TreeNode.OffsetSet[j];

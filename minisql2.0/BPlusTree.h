@@ -8,7 +8,8 @@
 #include <stdio.h>
 #include <cstring>
 #include <string>
-#include "BufferManager.h"
+//#include "BufferManager.h"
+#include "Buffer.h"
 
 using namespace std;
 
@@ -115,14 +116,14 @@ void Inver_ParseNode(char * BlockContent, Node<string> & TreeNode);
 template <class KeyType>
 void UpdateIndex(BPlusTree<KeyType> * BPT)
 {
-	char * Content = NULL;
+	char * Content = (char*)malloc(sizeof(char) * BLOCKSIZE);
 	/*Buffer bf;
 
 	BPT->Parse_Index(Content);
 	bf.updateBlock(BPT->BPlusTree_name, Content, 0);*/
 	BufferManager bm;
 
-	BPT->Parse_Index(Content);
+	BPT->Inver_ParseIndex(Content);
 	bm.updateBlock(BPT->BPlusTree_name, Content, 0);
 }
 
@@ -254,7 +255,7 @@ int Node<KeyType>::Insert_Into_Node(KeyType Key, OffsetType DataOffset)
 		int exist = Search_In_Node_exact(Key);
 		if(exist >= 0)
 		{
-			cout << "Error:In add(Keytype &key, offsetNumber val),key has already in the tree!" << endl;
+			//cout << "Error:In add(Keytype &key, offsetNumber val),key has already in the tree!" << endl;
 			return -1;
 		}
 		
@@ -288,7 +289,7 @@ int Node<KeyType>::Insert_Into_Node(KeyType Key)
 		int exist = Search_In_Node_exact(Key);
 		if (exist >= 0)
 		{
-			cout << "Error:In add(Keytype &key, offsetNumber val),key has already in the tree!" << endl;
+			//cout << "Error:In add(Keytype &key, offsetNumber val),key has already in the tree!" << endl;
 			return -1;
 		}
 
@@ -407,7 +408,7 @@ bool BPlusTree<KeyType>::Insert(KeyType Key, OffsetType DataOffset)
 	index = TargetLeaf.Search_In_Node_exact(Key);
 	if (index > 0)
 	{
-		cout << "Error:in insert key to index: the duplicated key!" << endl;
+		//cout << "Error:in insert key to index: the duplicated key!" << endl;
 		return false;
 	}
 	else
@@ -686,7 +687,7 @@ bool Node<KeyType>::RemoveAt(IndexType index)//移除第index个值右侧
 {
 	if (index > key_num)
 	{
-		cout << " Error, index is more than numbers of key";
+		//cout << " Error, index is more than numbers of key";
 		return false;
 	}
 	else
@@ -719,7 +720,7 @@ bool BPlusTree<KeyType>::Delete(KeyType Key)
 	IsFind = Search(Key, searchNodeOffset);
 	if (false == IsFind)
 	{
-		cout << "Error, there is no Key in the tree" << endl;
+		//cout << "Error, there is no Key in the tree" << endl;
 	}
 	else
 	{
@@ -1366,5 +1367,5 @@ void BPlusTree<KeyType>::Bm_Delete_Node(Node<KeyType> &node)
 	BufferManager bm;
 
 	//bf.Delete_Block(BPlusTree_name, node.Self);
-	bm.DeleteBlock(BPlusTree_name, node.Self);
+	bm.deleteBlock(BPlusTree_name, node.Self);
 }
