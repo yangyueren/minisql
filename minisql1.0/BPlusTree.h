@@ -1366,5 +1366,5 @@ void BPlusTree<KeyType>::Bm_Delete_Node(Node<KeyType> &node)
 	BufferManager bm;
 
 	//bf.Delete_Block(BPlusTree_name, node.Self);
-	bm.deleteBlock(BPlusTree_name, node.Self);
+	bm.DeleteBlock(BPlusTree_name, node.Self);
 }
