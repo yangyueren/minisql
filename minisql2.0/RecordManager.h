@@ -46,7 +46,7 @@ private:
     int deleteBlockRecord(int recordSize, int num, vector<Attribute> &attributeVector,vector<Condition> &conditionVector);
     int ifCondition(char* recordBegin,int recordSize, vector<Attribute> &attributeVector,vector<Condition> &conditionVector);
     void printRecord(char* recordBegin, int recordSize, vector<Attribute> &attributeVector);
-    int insertNewBlockIndex(string indexName, int recordSize, int num, vector<Attribute> &attributeVector,vector<Condition> &conditionVector);
+    int insertNewBlockIndex(string indexName, int recordSize, int num, vector<Attribute> &attributeVector,int i);
 };
 
 #endif
