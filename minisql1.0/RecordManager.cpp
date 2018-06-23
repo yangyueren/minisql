@@ -2,7 +2,8 @@
 #include"RecordManager.h"
 #include<cstring>
 #include<cstdio>
-#define no_empty "*"
+#define no_empty 1
+#define blockSize 4096
 using namespace std;
 
 //create table
@@ -83,7 +84,6 @@ int RecordManager::insertRecord(string tableName, char* record, int recordSize)
 
 	return pos; //insert is successful, 返回块号
 }
-
 
 
 int RecordManager::showClearRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector, int in)  //bn是该table下的block数量，catelog提供
@@ -236,11 +236,11 @@ int RecordManager::deleteBlockRecord(int recordSize, int num, vector<Attribute> 
 
 
 
-*/
+*//*
 //私函数 判断是否满足条件
 int RecordManager::ifCondition(char* recordBegin, int recordSize, vector<Attribute> &attributeVector,vector<Condition> &conditionVector)
 {
-    if (conditionVector == NULL) 
+    if (conditionVector.size() == 0) 
         return 1;
     
     int type;
@@ -275,9 +275,9 @@ int RecordManager::ifCondition(char* recordBegin, int recordSize, vector<Attribu
 
         for(int j = 0; j < conditionVector.size(); j++)
         {
-            if (conditionVector[j].attributeName == attributeName)
+            if (conditionVector[j].Attribute_Name == attributeName)
             {
-                if(!conditionVector[j].judege(tmp))
+                if(!conditionVector[j].judge(tmp))
                  	return 0;
             }
         }
@@ -338,7 +338,7 @@ int indexNewCreate(string indexName, int )
 {
 
 }*/
-
+/*
 int RecordManager::insertNewIndex(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,int j)  //bn是该table下的block数量，catelog提供
 {
 	//先输出属性行
