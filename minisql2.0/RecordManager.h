@@ -33,7 +33,7 @@ public:
     //删除记录
     int deleteRecord(string tableName,int recordSize, int bn,vector<Attribute> &attributeVector,vector<Condition> &conditionVector);  //删除符合条件的记录
     //插入索引
-    int insertNewIndex(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector);
+    int insertNewIndex(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,int i );
     //更新记录
     int updateRecord(string tabaleName,int recordSize, vector<Condition> &conditionVector);
 
@@ -46,7 +46,7 @@ private:
     int deleteBlockRecord(int recordSize, int num, vector<Attribute> &attributeVector,vector<Condition> &conditionVector);
     int ifCondition(char* recordBegin,int recordSize, vector<Attribute> &attributeVector,vector<Condition> &conditionVector);
     void printRecord(char* recordBegin, int recordSize, vector<Attribute> &attributeVector);
-    int insertNewBlockIndex(string indexName, int recordSize, int num, vector<Attribute> &attributeVector,int i);
+    int insertNewBlockIndex(string indexName, int recordSize, int num, vector<Attribute> &attributeVector,vector<Condition> &conditionVector);
 };
 
 #endif
