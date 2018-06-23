@@ -2,6 +2,7 @@
 #include"RecordManager.h"
 #include<cstring>
 #include<cstdio>
+#define no_empty "*"
 using namespace std;
 
 //create table
@@ -23,7 +24,7 @@ int RecordManager::tableCreate(string tableName)
 int RecordManager::tableDrop(string tableName)
 {
 	string filename = "TableFile_" + tableName;
-	bm.setInvaild(filename);
+	bm.setInvalid(filename);
 	if(remove(filename.c_str()))  //删除成功remove函数返回0
 		return 0;  //删除失败
 	return 1;  //删除成功
@@ -63,7 +64,7 @@ int RecordManager::insertRecord(string tableName, char* record, int recordSize)
 
 	//ask buffer the position
 	string filename = "TableFile_" + tableName;
-	int pos = bm.getInsertPosition(filename，recordSize + 1);    
+	int pos = bm.getInsertPosition(filename, recordSize + 1);    
 
 	//write record in
 	int use = 0;
@@ -127,11 +128,11 @@ int RecordManager::showBlockRecord(int recordSize, int num, vector<Attribute> &a
 {
 	int use = 0;
 	int count = 0;
-	while(use < blocksize)
+	while(use < blockSize)
 	{
 		if(bm.bufferPool[num].content[use] == no_empty)  //if record is available
 		{
-			if (ifCondition(use, recordSize, attributeVector, conditionVector))
+			if (ifCondition(bm.bufferPool[num].content[use+1], recordSize, attributeVector, conditionVector))
 			{
 				printRecord(bm.bufferPool[num].content[use+1], recordSize, attributeVector);
 				count++;
@@ -235,9 +236,9 @@ int RecordManager::deleteBlockRecord(int recordSize, int num, vector<Attribute> 
 
 
 
-
+*/
 //私函数 判断是否满足条件
-int RecordManager::ifCondition(char* recordBegin,int recordSize, vector<Attribute> &attributeVector,vector<Condition> &conditionVector)
+int RecordManager::ifCondition(char* recordBegin, int recordSize, vector<Attribute> &attributeVector,vector<Condition> &conditionVector)
 {
     if (conditionVector == NULL) 
         return 1;
@@ -285,7 +286,7 @@ int RecordManager::ifCondition(char* recordBegin,int recordSize, vector<Attribut
     }
     return 1;
 }
-*/
+
 
 //私函数 输出该条语句
 void RecordManager::printRecord(char* recordBegin, int recordSize, vector<Attribute> &attributeVector) //print this record
@@ -337,9 +338,8 @@ int indexNewCreate(string indexName, int )
 {
 
 }*/
-/*
 
-int RecordManager::insertNewIndex(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector)  //bn是该table下的block数量，catelog提供
+int RecordManager::insertNewIndex(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,int j)  //bn是该table下的block数量，catelog提供
 {
 	//先输出属性行
 	//travel all records if manzu
