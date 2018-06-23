@@ -53,7 +53,7 @@ bool IndexManager::DeleteIndex(string IndexName)
 	else
 	{
 		IndexSet.erase(IndexSet.begin()+index);
-		IndexNum--;
+		//IndexNum--;
 		cout<<"Index "<<IndexName<<" has been deleted!"<<endl;
 		return true;
 	}
@@ -118,7 +118,11 @@ OffsetType IndexManager::SearchInIndex(string IndexName, string KeyValue, int Ke
 	OffsetType offset = -1;
 	OffsetType data_offset = -1;
 	bool exist = false;
-	GetIndex(IndexName, KeyType);
+	if (IndexSet[0].IndexFileName != IndexName)
+	{
+		GetIndex(IndexName, KeyType);
+	}
+	
 
 	for(i=0; i<IndexNum; i++)
 		if(IndexName == IndexSet[i].IndexFileName)
@@ -129,7 +133,7 @@ OffsetType IndexManager::SearchInIndex(string IndexName, string KeyValue, int Ke
 
 	if(index == -1)
 	{
-		cout<<"No such index named "<<IndexName<<" ,Search failed!"<<endl;
+		//cout<<"No such index named "<<IndexName<<" ,Search failed!"<<endl;
 		return -1;
 	}
 	else
@@ -172,7 +176,10 @@ bool IndexManager::InsertIntoIndex(string IndexName, string KeyValue, int KeyTyp
 	bool succeed = false;
 	bool exist = false;
 	//OffsetType offset;
-	GetIndex(IndexName, KeyType);
+	if (IndexSet[0].IndexFileName != IndexName)
+	{
+		GetIndex(IndexName, KeyType);
+	}
 
 	for(i=0; i<IndexNum; i++)
 		if(IndexName == IndexSet[i].IndexFileName)
@@ -205,7 +212,10 @@ bool IndexManager::DeleteInIndex(string IndexName, string KeyValue, int KeyType)
 	OffsetType offset = -1;
 	bool succeed = false;
 	bool exist = false;
-	GetIndex(IndexName, KeyType);
+	if (IndexSet[0].IndexFileName != IndexName)
+	{
+		GetIndex(IndexName, KeyType);
+	}
 
 	for(i=0; i<IndexNum; i++)
 		if(IndexName == IndexSet[i].IndexFileName)
