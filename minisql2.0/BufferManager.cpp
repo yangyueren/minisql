@@ -247,7 +247,7 @@ void BufferManager::updateBlock(string fileName, char *UpdateContent, int offset
 	strcpy(bufferPool[offsetInBuffer].content,UpdateContent);
 	setDirty(offsetInBuffer);
 }
-void BufferManager::DeleteBlock(string fileName, int offsetInFile){//清除index缓存
+void BufferManager::deleteBlock(string fileName, int offsetInFile){//清除index缓存
 	int flag=0;
 	int bufferNum;
 	for(bufferNum=0;bufferNum<maxBufferNum;bufferNum++)

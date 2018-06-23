@@ -62,7 +62,7 @@ public:
 	void setInvalid(string filename,int offsetInFile);
 	char* getBlockByOffset(string fileName,int offsetInFile);//yyr
 	void updateBlock(string fileName, char *UpdateContent, int offsetInFile);
-	void DeleteBlock(string fileName, int offsetInFile);
+	void deleteBlock(string fileName, int offsetInFile);
 	int createNewBlock(string fileName);
 	friend class RecordManager;
 	friend class indexManager;
