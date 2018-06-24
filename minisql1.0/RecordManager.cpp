@@ -3,6 +3,7 @@
 #include<cstring>
 #include<cstdio>
 #define no_empty 1
+#define empty '*'
 #define blockSize 4096
 using namespace std;
 
@@ -88,17 +89,14 @@ int RecordManager::insertRecord(string tableName, char* record, int recordSize)
 
 
 
+
+
 int RecordManager::showClearRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector, int in)  //bn是该table下的block数量，catelog提供
 {
 
-	//travel all records if manzu
-	string filename ="TableFile_" + tableName;
-
-	int c = 0;
-	
-	c = c + showBlockRecord(recordSize, in, attributeVector, conditionVector);
+	showBlockRecord(recordSize, in, attributeVector, conditionVector);
 		
-	return c;
+	return 1;
 }
 
 
@@ -141,13 +139,12 @@ int RecordManager::showBlockRecord(int recordSize, int num, vector<Attribute> &a
 			}				
 		}
 
-
 		use = use + recordSize + 1;  //go to next record
 	}
 	return count;
 }
 
-/*
+
 int RecordManager::searchRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector, vector<Condition> &conditionVector)  //bn是该table下的block数量，catelog提供
 {
 	//先输出属性行
@@ -177,7 +174,7 @@ int RecordManager::searchBlockRecord(int recordSize, int num, vector<Attribute> 
 	{
 		if(bm.bufferPool[num].content[use] == no_empty)  //if record is available
 		{
-			if (ifCondition(use, recordSize, attributeVector, conditionVector))
+			if (ifCondition(&bm.bufferPool[num].content[use+1], recordSize, attributeVector, conditionVector))
 			{
 				count++;
 			}				
@@ -188,20 +185,18 @@ int RecordManager::searchBlockRecord(int recordSize, int num, vector<Attribute> 
 	return count;
 }
 
-*/
+
 //有索引删除
+
 int RecordManager::deleteClearRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector, int in)  //bn是该table下的block数量，catelog提供
 {
 
-	//travel all records if manzu
-	string filename ="TableFile_" + tableName;
 
-	int c = 0;
-	
-	c = c + deleteBlockRecord(recordSize, in, attributeVector, conditionVector);
+	deleteBlockRecord(recordSize, in, attributeVector, conditionVector);
 		
-	return c;
+	return 1;
 }
+
 //删除符合条件的记录
 int RecordManager::deleteRecord(string tableName,int recordSize, int bn,vector<Attribute> &attributeVector,vector<Condition> &conditionVector)  //bn是该table下的block数量，catelog提供
 {
@@ -274,29 +269,47 @@ int RecordManager::ifCondition(char* recordBegin, int recordSize, vector<Attribu
         {
         	typeSize = sizeof(float);
         	float tmp;
+        	memcpy(&tmp, contentBegin, typeSize);
+        	for(int j = 0; j < conditionVector.size(); j++)
+        	{
+            	if (conditionVector[j].Attribute_Name == attributeName)
+            	{
+                	if(!conditionVector[j].judge(tmp))
+                 		return 0;
+            	}
+        	}
         }
         if(type == 0)
         {
         	typeSize = sizeof(int);
         	int tmp;
+        	memcpy(&tmp, contentBegin, typeSize);
+        	for(int j = 0; j < conditionVector.size(); j++)
+        	{
+            	if (conditionVector[j].Attribute_Name == attributeName)
+            	{
+                	if(!conditionVector[j].judge(tmp))
+                 		return 0;
+            	}
+        	}
         }
         else
         {
         	typeSize = type;
-        	string tmp;
+        	char a[type];
+        	memset(a, 0, type);
+        	memcpy(a, contentBegin, typeSize);
+        	string tmp = a;
+        	for(int j = 0; j < conditionVector.size(); j++)
+        	{
+            	if (conditionVector[j].Attribute_Name == attributeName)
+            	{
+                	if(!conditionVector[j].judge(tmp))
+                 		return 0;
+            	}
+        	}
         }
         
-
-        memcpy(&tmp, contentBegin, typeSize);
-
-        for(int j = 0; j < conditionVector.size(); j++)
-        {
-            if (conditionVector[j].Attribute_Name == attributeName)
-            {
-                if(!conditionVector[j].judge(tmp))
-                 	return 0;
-            }
-        }
 
         contentBegin += typeSize;
     }
@@ -316,7 +329,7 @@ void RecordManager::printRecord(char* recordBegin, int recordSize, vector<Attrib
    		{
    			float f ;  
    			memcpy(&f, &p, sizeof(float));
-   			cout << f  << "  ";
+   			cout << f  << " , ";
    			p = p + sizeof(float);
    		}
 
@@ -325,7 +338,7 @@ void RecordManager::printRecord(char* recordBegin, int recordSize, vector<Attrib
    			int  d;
    			memcpy(&d, &p, sizeof(int));
    			p = p + sizeof(int);
-   			cout << d  << "  ";
+   			cout << d  << " , ";
    		}
 
    		else //char类型
@@ -334,7 +347,7 @@ void RecordManager::printRecord(char* recordBegin, int recordSize, vector<Attrib
    			int maxlength = attributeVector[i].type;
    			memcpy(&s, &p, maxlength);  
    			p = p + maxlength;  
-   			cout << s << "  ";
+   			cout << s << " , ";
    		}
 
 	}
@@ -354,8 +367,8 @@ int indexNewCreate(string indexName, int )
 {
 
 }*/
-/*
-int RecordManager::insertNewIndex(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,int j)  //bn是该table下的block数量，catelog提供
+
+int RecordManager::insertNewIndex(string tableName, string indexName, int recordSize, int bn, vector<Attribute> &attributeVector,int j)  //bn是该table下的block数量，catelog提供
 {
 	//先输出属性行
 	//travel all records if manzu
@@ -369,23 +382,23 @@ int RecordManager::insertNewIndex(string tableName, int recordSize, int bn, vect
 			break;
 		int s = bm.getBuffer(filename, i);
 
-		c = c + insertNewBlockIndexe(recordSize, s, attributeVector, conditionVector);
+		c = c + insertNewBlockIndex(indexName, recordSize, s, attributeVector, j);
 		
 		i = i + 1;
 	}
 	return c;
 }
 
-/*int RecordManager::insertNewBlockIndex(string indexName, int recordSize, int num, vector<Attribute> &attributeVector,vector<Condition> &conditionVector)
+int RecordManager::insertNewBlockIndex(string indexName, int recordSize, int num, vector<Attribute> &attributeVector, int j)
 {
 	int use = 0;
 	int count = 0;
-	string indexName = "IndexFile_" + indexName;
+	string fileindexName = "IndexFile_" + indexName;
 	while(use < blockSize)
 	{
 		if(bm.bufferPool[num].content[use] == no_empty)  //if record is available
 		{
-			char* addressBeigin = bm.bufferPool[num].content[use+1];
+			char* addressBeigin = &bm.bufferPool[num].content[use+1];
 			int i = 0;
 			int j = 0;
 			while(1)
@@ -398,17 +411,19 @@ int RecordManager::insertNewIndex(string tableName, int recordSize, int bn, vect
 				else
 					length = attributeVector[i].type;
 
-				if (attributeVector[i].name == conditionVector[0].Attribute_Name)
+
+				if (i == j)
 				{
-					string key;
-					memcpy(&key, addressBeigin, length);
-					InsertIntoIndex(indexName, key, conditionVector[0].type, num);	
+					char key[100];
+					memset(key, 0, 100);
+					memcpy(key, addressBeigin, length);
+					string www = key;
+				//	im.InsertIntoIndex(fileindexName, www, attributeVector[i].type, num);	
 					break;
 				}
 
 				addressBeigin = addressBeigin + length;
 			}
-
 			
 		}
 
@@ -416,4 +431,4 @@ int RecordManager::insertNewIndex(string tableName, int recordSize, int bn, vect
 	}
 	return count;
 }
-*/
+

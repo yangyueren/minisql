@@ -15,7 +15,7 @@ class RecordManager{
 public:
 	RecordManager(){};
     BufferManager bm;
-    IndexManager indexuse;
+   	IndexManager indexuse;
     
     int tableCreate(string tableName);  //创建表
     int tableDrop(string tableName);  //删除表   
@@ -29,15 +29,14 @@ public:
     int showClearRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector, int in); //精确查找，in是index返回的块号
    //无索引查找
     int showRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector); //bn是这个表有几个块，输出所有符合条件的记录,返回值是记录数量
-    
-    //暂时用不到
- //   int searchRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector);
+ 
+     int searchRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector);
     
     //删除记录
     //无索引
     int deleteRecord(string tableName,int recordSize, int bn,vector<Attribute> &attributeVector,vector<Condition> &conditionVector);  //删除符合条件的记录
     //有索引
-    int deleteClearRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector, int in)  //bn是该table下的block数量，catelog提供  
+    int deleteClearRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector, int in) ; //bn是该table下的block数量，catelog提供  
 
 
 
@@ -46,7 +45,7 @@ public:
 
 
     //插入索引
-    int insertNewIndex(string tableName, string indexName, int recordSize, int bn, vector<Attribute> &attributeVector,int j) 
+    int insertNewIndex(string tableName, string indexName, int recordSize, int bn, vector<Attribute> &attributeVector,int j) ;
     //更新记录
  //   int updateRecord(string tabaleName,int recordSize, vector<Condition> &conditionVector);
 
@@ -55,7 +54,7 @@ private:
     //用来查找
     int showBlockRecord(int recordSize, int num, vector<Attribute> &attributeVector,vector<Condition> &conditionVector);
 
-    //int searchBlockRecord(int recordSize, int num, vector<Attribute> &attributeVector,vector<Condition> &conditionVector);
+    int searchBlockRecord(int recordSize, int num, vector<Attribute> &attributeVector,vector<Condition> &conditionVector);
   // 用作删除
     int deleteBlockRecord(int recordSize, int num, vector<Attribute> &attributeVector,vector<Condition> &conditionVector);
     int ifCondition(char* recordBegin,int recordSize, vector<Attribute> &attributeVector,vector<Condition> &conditionVector);
