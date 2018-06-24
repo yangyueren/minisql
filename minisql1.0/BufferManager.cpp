@@ -17,7 +17,7 @@ void Buffer::initialize(){
 	offsetInFile=0; //该块在文件中的偏移量
 	time=0; //最近一次被访问的时间
 	memset(content,empty,blockSize-1);
-	content[blockSize]='\0';
+	content[blockSize-1]='\0';
 }
 string Buffer::getContent(int headPos,int tailPos){
 	string tmp="";
