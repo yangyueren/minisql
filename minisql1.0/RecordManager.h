@@ -5,7 +5,7 @@
 #include "Attribute.hpp"
 #include "RecordManager.h"
 #include "BufferManager.h"
-#include "IndexManager.h"
+//#include "IndexManager.h"
 #include <string>
 #include <vector>
 using namespace std;
@@ -14,8 +14,7 @@ using namespace std;
 class RecordManager{
 public:
 	RecordManager(){};
-    BufferManager bm;
-   	IndexManager indexuse;
+
     
     int tableCreate(string tableName);  //创建表
     int tableDrop(string tableName);  //删除表   
