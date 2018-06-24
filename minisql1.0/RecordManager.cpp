@@ -65,7 +65,8 @@ int RecordManager::insertRecord(string tableName, char* record, int recordSize)
 
 	//ask buffer the position
 	string filename = "TableFile_" + tableName;
-	int pos = bm.getInsertPosition(filename, recordSize + 1);    
+	int pos = -1;
+	pos = bm.getInsertPosition(filename, recordSize + 1);    
 
 	//write record in
 	int use = 0;
@@ -187,14 +188,26 @@ int RecordManager::searchBlockRecord(int recordSize, int num, vector<Attribute> 
 	return count;
 }
 
+*/
+//有索引删除
+int RecordManager::deleteClearRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector, int in)  //bn是该table下的block数量，catelog提供
+{
 
+	//travel all records if manzu
+	string filename ="TableFile_" + tableName;
 
-
+	int c = 0;
+	
+	c = c + deleteBlockRecord(recordSize, in, attributeVector, conditionVector);
+		
+	return c;
+}
 //删除符合条件的记录
 int RecordManager::deleteRecord(string tableName,int recordSize, int bn,vector<Attribute> &attributeVector,vector<Condition> &conditionVector)  //bn是该table下的block数量，catelog提供
 {
 	//先输出属性行
 	//travel all records if manzu
+	int c = 0;
 	string filename ="TableFile_" + tableName;
 	int i = 0;
 	while(1)   //遍历所有记录
@@ -204,31 +217,33 @@ int RecordManager::deleteRecord(string tableName,int recordSize, int bn,vector<A
 			break;
 		int s = bm.getBuffer(filename, i);
 
-		deleteBlockRecord(recordSize, s, attributeVector, conditionVector);
+		c = c + deleteBlockRecord(recordSize, s, attributeVector, conditionVector);
 		
 		i = i + 1;
 	}
-	return 1;
+	return c;
 }
 
 int RecordManager::deleteBlockRecord(int recordSize, int num, vector<Attribute> &attributeVector,vector<Condition> &conditionVector)
 {
 	int use = 0;
+	int count = 0;
 	while(use < blockSize)
 	{
 		if(bm.bufferPool[num].content[use] == no_empty)  //if record is available
 		{
-			if (ifCondition(use, recordSize, attributeVector, conditionVector))
+			if (ifCondition(&bm.bufferPool[num].content[use+1], recordSize, attributeVector, conditionVector))
 			{
 				bm.bufferPool[num].content[use] = empty;
 				bm.writtenToDisk(num);
+				count ++;
 			}
 				
 		}
 		
 		use = use + recordSize + 1;  //go to next record
 	}
-	return 1;
+	return count;
 }
 
 
@@ -237,7 +252,7 @@ int RecordManager::deleteBlockRecord(int recordSize, int num, vector<Attribute> 
 
 
 
-*/
+
 //私函数 判断是否满足条件
 int RecordManager::ifCondition(char* recordBegin, int recordSize, vector<Attribute> &attributeVector,vector<Condition> &conditionVector)
 {
