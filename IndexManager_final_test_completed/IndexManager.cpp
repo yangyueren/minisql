@@ -8,7 +8,7 @@ IndexManager::IndexManager()
 	struct Index temp;
 	temp.IndexFileName = "";
 	temp.Type = -1;
-	IndexSet.push_back(struct Index());
+	IndexSet.push_back(temp);
 }
 
 IndexManager::~IndexManager()
