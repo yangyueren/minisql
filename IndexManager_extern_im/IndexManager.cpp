@@ -113,8 +113,8 @@ bool IndexManager::CreateIndex(string IndexName, int KeySize, int Key_Type)
 {
 	int Degree;
 
-	//Degree = 500/KeySize;
-	Degree = 5;
+	Degree = 1000/KeySize;
+	//Degree = 5;
 	return CreateIndex(IndexName, KeySize, Key_Type, Degree);
 }
 

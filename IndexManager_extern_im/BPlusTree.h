@@ -538,7 +538,7 @@ void BPlusTree<KeyType>::Inver_ParseIndex(char * BlockContent)
 	memcpy(BlockContent + UsingSize, temp.character, sizeof(int));
 	UsingSize += sizeof(int);
 
-	strcpy_s(temp_key, BPlusTree_name.c_str());
+	strcpy(temp_key, BPlusTree_name.c_str());
 	memcpy(BlockContent + UsingSize, temp_key, 100);
 	UsingSize += 100;
 }
