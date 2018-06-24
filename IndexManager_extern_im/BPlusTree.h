@@ -721,6 +721,7 @@ bool BPlusTree<KeyType>::Delete(KeyType Key)
 	if (false == IsFind)
 	{
 		//cout << "Error, there is no Key in the tree" << endl;
+		return false;
 	}
 	else
 	{
@@ -770,6 +771,7 @@ bool BPlusTree<KeyType>::Delete(KeyType Key)
 			}
 		}
 	}
+	return true;
 }
 
 template <class KeyType>
