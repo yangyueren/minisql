@@ -8,9 +8,9 @@
 #include <stdio.h>
 #include <cstring>
 #include <string>
-//#include "BufferManager.h"
-#include "Buffer.h"
-
+//#include "BufferManager_y.h"
+//#include "Buffer.h"
+#include "Buffer_y_disk.h"
 using namespace std;
 
 typedef int OffsetType;
@@ -121,10 +121,10 @@ void UpdateIndex(BPlusTree<KeyType> * BPT)
 
 	BPT->Parse_Index(Content);
 	bf.updateBlock(BPT->BPlusTree_name, Content, 0);*/
-	BufferManager bm;
+	//BufferManager_y bm_y;
 
 	BPT->Inver_ParseIndex(Content);
-	bm.updateBlock(BPT->BPlusTree_name, Content, 0);
+	bm_y.updateBlock(BPT->BPlusTree_name, Content, 0);
 }
 
 
@@ -139,9 +139,9 @@ void GetIndexHead(BPlusTree<KeyType> * BPT)
 	BN = bf.getBlockByOffset(BPT->BPlusTree_name, 0);
 	Content = bf.getContent(BN);
 	BPT->Parse_Index(Content);*/
-	BufferManager bm;
+	//BufferManager_y bm_y;
 
-	Content = bm.getBlockByOffset(BPT->BPlusTree_name, 0);
+	Content = bm_y.getBlockByOffset(BPT->BPlusTree_name, 0);
 	BPT->Parse_Index(Content);
 }
 
@@ -473,6 +473,7 @@ OffsetType BPlusTree<KeyType>::Get_Leaf_Node(KeyType key, Node<KeyType> & TreeNo
 template <class KeyType>
 void BPlusTree<KeyType>::Parse_Index(char * BlockContent)
 {
+	
 	data_trans temp;
 	char temp_key[100];
 	int UsingSize = 0;
@@ -538,9 +539,11 @@ void BPlusTree<KeyType>::Inver_ParseIndex(char * BlockContent)
 	memcpy(BlockContent + UsingSize, temp.character, sizeof(int));
 	UsingSize += sizeof(int);
 
-	strcpy_s(temp_key, BPlusTree_name.c_str());
+	strcpy(temp_key, BPlusTree_name.c_str());
 	memcpy(BlockContent + UsingSize, temp_key, 100);
 	UsingSize += 100;
+
+
 }
 
 
@@ -721,6 +724,7 @@ bool BPlusTree<KeyType>::Delete(KeyType Key)
 	if (false == IsFind)
 	{
 		//cout << "Error, there is no Key in the tree" << endl;
+		return false;
 	}
 	else
 	{
@@ -770,6 +774,7 @@ bool BPlusTree<KeyType>::Delete(KeyType Key)
 			}
 		}
 	}
+	return true;
 }
 
 template <class KeyType>
@@ -1220,30 +1225,34 @@ void BPlusTree<KeyType>::Level_List()
 	Node<KeyType> curNode, sonNode;
 	Node<KeyType> leftNode, rightNode;
 	GetNode(curNode, root);
-	GetNode(sonNode, curNode.OffsetSet[0]);
-	while (!curNode.IsLeaf)
+	if (curNode.IsLeaf == false)
 	{
-		GetNode(leftNode, curNode.Self);//the leftest node of the row
-		while (curNode.NextNode != -1)
+		GetNode(sonNode, curNode.OffsetSet[0]);
+		while (!curNode.IsLeaf)
 		{
+			GetNode(leftNode, curNode.Self);//the leftest node of the row
+			while (curNode.NextNode != -1)
+			{
+				cout << curNode.Self << "[ ";
+				for (int i = 0; i < curNode.key_num; ++i)
+				{
+					cout << curNode.KeySet[i] << " ";
+				}
+				cout << "] " << curNode.Parent << ",  ";
+				GetNode(curNode, curNode.NextNode);
+			}
+			//last node of each row
 			cout << curNode.Self << "[ ";
 			for (int i = 0; i < curNode.key_num; ++i)
 			{
 				cout << curNode.KeySet[i] << " ";
 			}
-			cout << "] " << curNode.Parent<< ",  ";
-			GetNode(curNode, curNode.NextNode);
+			cout << "] " << curNode.Parent << ",  " << endl;
+			//next row
+			GetNode(curNode, leftNode.OffsetSet[0]);
 		}
-		//last node of each row
-		cout << curNode.Self << "[ ";
-		for (int i = 0; i < curNode.key_num; ++i)
-		{
-			cout << curNode.KeySet[i] << " ";
-		}
-		cout << "] "  << curNode.Parent << ",  " << endl;
-		//next row
-		GetNode(curNode, leftNode.OffsetSet[0]);
 	}
+	
 	//if leaf head
 
 	while (curNode.NextNode != -1)
@@ -1340,10 +1349,10 @@ void BPlusTree<KeyType>::UpdateNode(Node<KeyType> & node, OffsetType offset)
 
 	Inver_ParseNode(UpdateContent, node);
 	bf.updateBlock(BPlusTree_name, UpdateContent, offset);*/
-	BufferManager bm;
+	//BufferManager_y bm_y;
 
 	Inver_ParseNode(UpdateContent, node);
-	bm.updateBlock(BPlusTree_name, UpdateContent, offset);
+	bm_y.updateBlock(BPlusTree_name, UpdateContent, offset);
 }
 
 template <class KeyType>
@@ -1355,8 +1364,8 @@ void BPlusTree<KeyType>::GetNode(Node<KeyType> & node, OffsetType offset)
 
 	BN = bf.getBlockByOffset(BPlusTree_name, offset);
 	BlockContent = bf.getContent(BN);*/
-	BufferManager bm;
-	BlockContent = bm.getBlockByOffset(BPlusTree_name, offset);
+	//BufferManager_y bm_y;
+	BlockContent = bm_y.getBlockByOffset(BPlusTree_name, offset);
 	ParseNode(BlockContent, node);
 }
 
@@ -1364,8 +1373,8 @@ template <class KeyType>
 void BPlusTree<KeyType>::Bm_Delete_Node(Node<KeyType> &node)
 {
 	//Buffer bf;
-	BufferManager bm;
+	//BufferManager_y bm_y;
 
 	//bf.Delete_Block(BPlusTree_name, node.Self);
-	bm.deleteBlock(BPlusTree_name, node.Self);
+	bm_y.deleteBlock(BPlusTree_name, node.Self);
 }

@@ -2,7 +2,7 @@
 
 int BufferManager::used_byte = 0;
 char BufferManager::result[50000000] = { '\0' };
-
+BufferManager bm;
 
 BufferManager::BufferManager()
 {

@@ -1,6 +1,7 @@
 #include "IndexManager.h"
 
 using namespace std;
+IndexManager im;
 
 IndexManager::IndexManager()
 {
@@ -8,7 +9,7 @@ IndexManager::IndexManager()
 	struct Index temp;
 	temp.IndexFileName = "";
 	temp.Type = -1;
-	IndexSet.push_back(struct Index());
+	IndexSet.push_back(temp);
 }
 
 IndexManager::~IndexManager()
@@ -22,6 +23,7 @@ bool IndexManager::GetIndex(string IndexName, int Key_Type)
 
 	temp_index.Type = Key_Type;
 	temp_index.IndexFileName = IndexName;
+	temp_index.B_Plus_Tree_int.BPlusTree_name = IndexName;
 	if(Key_Type == INT_TYPE)
 		GetIndexHead(&temp_index.B_Plus_Tree_int);
 	else if(Key_Type == FLOAT_TYPE)
@@ -104,6 +106,8 @@ bool IndexManager::CreateIndex(string IndexName, int KeySize, int Key_Type, int 
 	else
 		return false;
 
+	bm_y.writeBackDisk(IndexName);
+
 	return true;
 }
 
@@ -112,7 +116,7 @@ bool IndexManager::CreateIndex(string IndexName, int KeySize, int Key_Type)
 {
 	int Degree;
 
-	//Degree = 500/KeySize;
+	//Degree = 1000/KeySize;
 	Degree = 5;
 	return CreateIndex(IndexName, KeySize, Key_Type, Degree);
 }
@@ -127,9 +131,14 @@ OffsetType IndexManager::SearchInIndex(string IndexName, string KeyValue, int Ke
 	bool exist = false;
 	if (IndexSet[0].IndexFileName != IndexName)
 	{
+		if (IndexSet[0].IndexFileName != "")
+		{
+			bm_y.writeBackDisk(IndexSet[0].IndexFileName);
+		}
+		bm_y.loadToArray(IndexName);
 		GetIndex(IndexName, Key_Type);
+
 	}
-	
 
 	for(i=0; i<IndexNum; i++)
 		if(IndexName == IndexSet[i].IndexFileName)
@@ -185,7 +194,18 @@ bool IndexManager::InsertIntoIndex(string IndexName, string KeyValue, int Key_Ty
 	//OffsetType offset;
 	if (IndexSet[0].IndexFileName != IndexName)
 	{
+
+	
+		if (IndexSet[0].IndexFileName != "")
+		{
+			bm_y.writeBackDisk(IndexSet[0].IndexFileName);
+		}
+		bm_y.loadToArray(IndexName);
 		GetIndex(IndexName, Key_Type);
+
+		
+	/*	bm_y.loadToArray(IndexName);
+		GetIndex(IndexName, Key_Type);*/
 	}
 
 	for(i=0; i<IndexNum; i++)
@@ -221,7 +241,13 @@ bool IndexManager::DeleteInIndex(string IndexName, string KeyValue, int Key_Type
 	bool exist = false;
 	if (IndexSet[0].IndexFileName != IndexName)
 	{
+		if (IndexSet[0].IndexFileName != "")
+		{
+			bm_y.writeBackDisk(IndexSet[0].IndexFileName);
+		}
+		bm_y.loadToArray(IndexName);
 		GetIndex(IndexName, Key_Type);
+
 	}
 
 	for(i=0; i<IndexNum; i++)
@@ -230,24 +256,7 @@ bool IndexManager::DeleteInIndex(string IndexName, string KeyValue, int Key_Type
 			index = i;
 			break;
 		}
-	/*
-	if(index == -1)
-	{
-		cout<<"No such index named "<<IndexName<<" ,deletion failed!"<<endl;
-		return -1;
-	}
-	else
-	{
-		if(Key_Type == INT_TYPE)
-			exist = IndexSet[i].B_Plus_Tree_int.Search(stoi(KeyValue), offset);
-		else if(Key_Type == FLOAT_TYPE)
-			exist = IndexSet[i].B_Plus_Tree_float.Search(stof(KeyValue), offset);
-		else if(Key_Type == STRING_TYPE)
-			exist = IndexSet[i].B_Plus_Tree_string.Search(KeyValue, offset);
-		else
-			exist = false;
-	}	
-	*/
+
 	if(Key_Type == INT_TYPE)
 		succeed = IndexSet[i].B_Plus_Tree_int.Delete(stoi(KeyValue));
 	else if(Key_Type == FLOAT_TYPE)
@@ -260,11 +269,29 @@ bool IndexManager::DeleteInIndex(string IndexName, string KeyValue, int Key_Type
 	return succeed;
 }
 
+
+
+void IndexManager::writeToDisk(string indexName)
+{
+	DeleteIndex(indexName);
+	bm_y.writeBackDisk(indexName);
+}
+
 /********************************/
-void IndexManager::levelListIndex(string IndexName)
+void IndexManager::levelListIndex(string IndexName, int Key_Type)
 {
 	int i = 0;
 	int index = 0;
+	if (IndexSet[0].IndexFileName != IndexName)
+	{
+		if (IndexSet[0].IndexFileName != "")
+		{
+			bm_y.writeBackDisk(IndexSet[0].IndexFileName);
+		}
+		bm_y.loadToArray(IndexName);
+		GetIndex(IndexName, Key_Type);
+
+	}
 	for (i = 0; i<IndexNum; i++)
 		if (IndexName == IndexSet[i].IndexFileName)
 		{
