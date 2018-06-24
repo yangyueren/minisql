@@ -418,7 +418,7 @@ int RecordManager::insertNewBlockIndex(string indexName, int recordSize, int num
 					memset(key, 0, 100);
 					memcpy(key, addressBeigin, length);
 					string www = key;
-				//	im.InsertIntoIndex(fileindexName, www, attributeVector[i].type, num);	
+					im.InsertIntoIndex(fileindexName, www, attributeVector[i].type, num);	
 					break;
 				}
 
