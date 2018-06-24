@@ -86,7 +86,7 @@ int RecordManager::insertRecord(string tableName, char* record, int recordSize)
 }
 
 
-/*
+
 int RecordManager::showClearRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector, int in)  //bn是该table下的block数量，catelog提供
 {
 
@@ -133,9 +133,9 @@ int RecordManager::showBlockRecord(int recordSize, int num, vector<Attribute> &a
 	{
 		if(bm.bufferPool[num].content[use] == no_empty)  //if record is available
 		{
-			if (ifCondition(bm.bufferPool[num].content[use+1], recordSize, attributeVector, conditionVector))
+			if (ifCondition(&bm.bufferPool[num].content[use+1], recordSize, attributeVector, conditionVector))
 			{
-				printRecord(bm.bufferPool[num].content[use+1], recordSize, attributeVector);
+				printRecord(&bm.bufferPool[num].content[use+1], recordSize, attributeVector);
 				count++;
 			}				
 		}
@@ -237,7 +237,7 @@ int RecordManager::deleteBlockRecord(int recordSize, int num, vector<Attribute> 
 
 
 
-*//*
+*/
 //私函数 判断是否满足条件
 int RecordManager::ifCondition(char* recordBegin, int recordSize, vector<Attribute> &attributeVector,vector<Condition> &conditionVector)
 {
