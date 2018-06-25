@@ -271,10 +271,13 @@ bool IndexManager::DeleteInIndex(string IndexName, string KeyValue, int Key_Type
 
 
 
-void IndexManager::writeToDisk(string indexName)
+void IndexManager::writeToDisk()
 {
-	DeleteIndex(indexName);
-	bm_y.writeBackDisk(indexName);
+
+	string IndexName;	
+	IndexName == IndexSet[0].IndexFileName;		
+	DeleteIndex(IndexName);
+	bm_y.writeBackDisk(IndexName);
 }
 
 /********************************/
