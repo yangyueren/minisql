@@ -7,30 +7,26 @@
 using namespace std;
 typedef int OffsetType;
 #define OffsetByte 4096
-class BufferManager
+class BufferManager_y
 {
 public:
-	BufferManager();
-	~BufferManager();
-	char* Get_Node(OffsetType offset);
-	void Update_Node(OffsetType offset, char * Content);
-	OffsetType Create_Node();
-	void Delete_Node(OffsetType offset);
-	void UpdateIndex(char * Content);
-	char* GetIndexHead();
+	BufferManager_y();
+	~BufferManager_y();
+
 
 	char* getBlockByOffset(string fileName, int offsetInFile);//yyr
 	void updateBlock(string fileName, char *UpdateContent, int offsetInFile);
 	void deleteBlock(string fileName, int offsetInFile);
 	int createNewBlock(string fileName);
-
+	void loadToArray(string filename);
+	void writeBackDisk(string fileName);
 	static char result[50000000];
 	static int used_byte;
 private:
 
 
 };
-extern BufferManager bm;
+extern BufferManager_y bm_y;
 
 
 
