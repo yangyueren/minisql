@@ -311,3 +311,70 @@ void IndexManager::levelListIndex(string IndexName, int Key_Type)
 	IndexSet[i].B_Plus_Tree_int.Level_List();
 
 }
+
+bool IndexManager::SearchInRange(string IndexName, int Key_Type, string min_KeyValue, bool isLeftEqual,
+	string max_KeyValue, bool isRightEqual,  vector<int> &return_result)
+{
+	int i;
+	int index = -1;
+
+	bool exist = false;
+	if (IndexSet[0].IndexFileName != IndexName)
+	{
+		if (IndexSet[0].IndexFileName != "")
+		{
+			bm_y.writeBackDisk(IndexSet[0].IndexFileName);
+			DeleteIndex(IndexSet[0].IndexFileName);
+		}
+		bm_y.loadToArray(IndexName);
+		GetIndex(IndexName, Key_Type);
+
+	}
+
+	for (i = 0; i<IndexNum; i++)
+		if (IndexName == IndexSet[i].IndexFileName)
+		{
+			index = i;
+			break;
+		}
+
+	if (index == -1)
+	{
+		//cout<<"No such index named "<<IndexName<<" ,Search failed!"<<endl;
+		return -1;
+	}
+	else
+	{
+		if (Key_Type == INT_TYPE)
+		{
+			IndexSet[i].B_Plus_Tree_int.SearchRange(stoi(min_KeyValue), isLeftEqual, stoi(max_KeyValue), isRightEqual, return_result);
+			if (return_result[0] > 0)
+			{
+				exist = true;
+			}
+		}
+		else if (Key_Type == FLOAT_TYPE)
+		{
+			IndexSet[i].B_Plus_Tree_float.SearchRange(stof(min_KeyValue), isLeftEqual, stof(max_KeyValue), isRightEqual, return_result);
+			if (return_result[0] > 0)
+			{
+				exist = true;
+			}
+		}
+		else if (Key_Type == STRING_TYPE)
+		{
+			IndexSet[i].B_Plus_Tree_string.SearchRange(min_KeyValue, isLeftEqual, max_KeyValue, isRightEqual, return_result);
+			if (return_result[0] > 0)
+			{
+				exist = true;
+			}
+		}
+		else
+			exist = false;
+	}
+
+	if (exist)
+		return true;
+	else
+		return -1;
+}

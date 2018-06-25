@@ -102,6 +102,9 @@ public:
 	void Bm_Delete_Node(Node<KeyType> &node);
 	void UpdateNode(Node<KeyType> & node, OffsetType offset);
 	void GetNode(Node<KeyType> & node, OffsetType offset);
+
+
+	void SearchRange(KeyType min, bool isLeftEqual, KeyType max, bool isRightEqual, vector<int> & return_result);//yyr 2018626
 };
 
 /******************************************************************************************/
@@ -1182,7 +1185,7 @@ bool BPlusTree<KeyType>::AdjustAfterDelete(Node<KeyType> & curNode)
 
 
 template <class KeyType>
-bool BPlusTree<KeyType>::Search(KeyType Key, OffsetType & offset)
+bool BPlusTree<KeyType>::Search(KeyType Key, OffsetType & offset)//return index offset, not dataoffset
 {
 	Node<KeyType> curNode;
 	Node<KeyType> rootNode, sonNode;
@@ -1275,6 +1278,7 @@ void BPlusTree<KeyType>::Level_List()
 	cout << endl;
 
 }
+
 
 
 
@@ -1377,4 +1381,160 @@ void BPlusTree<KeyType>::Bm_Delete_Node(Node<KeyType> &node)
 
 	//bf.Delete_Block(BPlusTree_name, node.Self);
 	bm_y.deleteBlock(BPlusTree_name, node.Self);
+}
+
+template <typename KeyType>
+void BPlusTree<KeyType>::SearchRange(KeyType min, bool isLeftEqual, KeyType max, bool isRightEqual, vector<int>& return_result)
+{
+	int count = 0;
+	Node<KeyType> leftNode, rightNode, curNode;
+
+	OffsetType offset_min, offset_max;
+	Search(min, offset_min);
+	Search(max, offset_max);
+	GetNode(leftNode, offset_min);
+	GetNode(rightNode, offset_max);
+	int i = 0;
+	if (min > max)
+	{
+		return_result.insert(return_result.begin(), count);
+		return;
+	}
+	else if (leftNode.Self == rightNode.Self)
+	{
+		i = 0;
+		if (isLeftEqual && isRightEqual)
+		{
+			while (i < leftNode.key_num)
+			{
+				if (leftNode.KeySet.at(i) >= min && leftNode.KeySet.at(i) <= max)
+				{
+					return_result.insert(return_result.begin() + count, leftNode.OffsetSet.at(i));
+					count++;
+				}
+				i++;
+			}
+			return_result.insert(return_result.begin(), count);
+		}
+		else if (!isLeftEqual && isRightEqual)
+		{
+			while (i < leftNode.key_num)
+			{
+				if (leftNode.KeySet.at(i) > min && leftNode.KeySet.at(i) <= max)
+				{
+					return_result.insert(return_result.begin() + count, leftNode.OffsetSet.at(i));
+					count++;
+				}
+				i++;
+			}
+			return_result.insert(return_result.begin(), count);
+		}
+		else if (isLeftEqual && (!isRightEqual))
+		{
+			while (i < leftNode.key_num)
+			{
+				if (leftNode.KeySet.at(i) >= min && leftNode.KeySet.at(i) < max)
+				{
+					return_result.insert(return_result.begin() + count, leftNode.OffsetSet.at(i));
+					count++;
+				}
+				i++;
+			}
+			return_result.insert(return_result.begin(), count);
+		}
+		else
+		{
+			while (i < leftNode.key_num)
+			{
+				if (leftNode.KeySet.at(i) > min && leftNode.KeySet.at(i) < max)
+				{
+					return_result.insert(return_result.begin() + count, leftNode.OffsetSet.at(i));
+					count++;
+				}
+				i++;
+			}
+			return_result.insert(return_result.begin(), count);
+		}
+		
+	}
+
+	else
+	{
+		if (isLeftEqual)
+		{
+			i = 0;
+			while (i < leftNode.key_num)
+			{
+				if (leftNode.KeySet.at(i) >= min)
+				{
+					return_result.insert(return_result.begin() + count, leftNode.OffsetSet.at(i));
+					count++;
+				}
+				i++;
+			}
+		}
+		else
+		{
+			i = 0;
+			while (i < leftNode.key_num)
+			{
+				if (leftNode.KeySet.at(i) > min)
+				{
+					return_result.insert(return_result.begin() + count, leftNode.OffsetSet.at(i));
+					count++;
+				}
+				i++;
+			}
+		}
+		
+		GetNode(curNode, leftNode.NextNode);
+		while (curNode.Self != rightNode.Self)
+		{
+			
+			for (int i = 0; i < curNode.key_num; ++i)
+			{
+				if (curNode.KeySet.at(i) < max)
+				{
+					return_result.insert(return_result.begin() + count, leftNode.OffsetSet.at(i));
+					count++;
+				}
+				
+			}
+			
+			GetNode(curNode, curNode.NextNode);
+		}
+		if (isRightEqual)
+		{
+			i = 0;
+			while (i < rightNode.key_num)
+			{
+				if (rightNode.KeySet.at(i) <= max && rightNode.KeySet.at(i) >= min)
+				{
+					return_result.insert(return_result.begin() + count, rightNode.OffsetSet.at(i));
+					count++;
+				}
+				i++;
+			}
+			return_result.insert(return_result.begin(), count);
+		}
+		else
+		{
+			i = 0;
+			while (i < rightNode.key_num)
+			{
+				if (rightNode.KeySet.at(i) < max && rightNode.KeySet.at(i) >= min)
+				{
+					return_result.insert(return_result.begin() + count, rightNode.OffsetSet.at(i));
+					count++;
+				}
+				i++;
+			}
+			return_result.insert(return_result.begin(), count);
+		}
+	}
+
+	
+	
+
+
 }
