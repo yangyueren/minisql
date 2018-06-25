@@ -29,17 +29,17 @@ int main(int argc,char * argv[])
 	im.InsertIntoIndex(indexName, "5", 0, 2);
 	im.InsertIntoIndex(indexName, "6", 0, 2);
 	im.InsertIntoIndex(indexName, "7", 0, 7);
-	//im.InsertIntoIndex(indexName, "8", 0, 2);
-	//im.InsertIntoIndex(indexName, "9", 0, 2);
-	//im.InsertIntoIndex(indexName, "10", 0, 10);
-	//im.InsertIntoIndex(indexName, "11", 0, 2);
-	//im.InsertIntoIndex(indexName, "12", 0, 2);
+	im.InsertIntoIndex(indexName, "8", 0, 2);
+	im.InsertIntoIndex(indexName, "9", 0, 2);
+	im.InsertIntoIndex(indexName, "10", 0, 10);
+	im.InsertIntoIndex(indexName, "11", 0, 2);
+	im.InsertIntoIndex(indexName, "12", 0, 2);
 	im.levelListIndex(indexName, 0);
 
 	im.DeleteInIndex(indexName, "9", 0);
 	im.DeleteInIndex(indexName, "8", 0);
 	im.levelListIndex(indexName, 0);
-	//im.writeToDisk(indexName);
+	im.writeToDisk();
 	int temp = im.SearchInIndex(indexName, "10", 0);
 	cout << temp << endl;
 	temp = im.SearchInIndex(indexName, "7", 0);

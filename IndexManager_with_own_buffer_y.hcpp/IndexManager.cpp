@@ -134,6 +134,7 @@ OffsetType IndexManager::SearchInIndex(string IndexName, string KeyValue, int Ke
 		if (IndexSet[0].IndexFileName != "")
 		{
 			bm_y.writeBackDisk(IndexSet[0].IndexFileName);
+			DeleteIndex(IndexSet[0].IndexFileName);
 		}
 		bm_y.loadToArray(IndexName);
 		GetIndex(IndexName, Key_Type);
@@ -199,6 +200,7 @@ bool IndexManager::InsertIntoIndex(string IndexName, string KeyValue, int Key_Ty
 		if (IndexSet[0].IndexFileName != "")
 		{
 			bm_y.writeBackDisk(IndexSet[0].IndexFileName);
+			DeleteIndex(IndexSet[0].IndexFileName);
 		}
 		bm_y.loadToArray(IndexName);
 		GetIndex(IndexName, Key_Type);
@@ -244,6 +246,7 @@ bool IndexManager::DeleteInIndex(string IndexName, string KeyValue, int Key_Type
 		if (IndexSet[0].IndexFileName != "")
 		{
 			bm_y.writeBackDisk(IndexSet[0].IndexFileName);
+			DeleteIndex(IndexSet[0].IndexFileName);
 		}
 		bm_y.loadToArray(IndexName);
 		GetIndex(IndexName, Key_Type);
@@ -276,8 +279,12 @@ void IndexManager::writeToDisk()
 
 	string IndexName;	
 	IndexName == IndexSet[0].IndexFileName;		
-	DeleteIndex(IndexName);
-	bm_y.writeBackDisk(IndexName);
+	if (IndexName != "")
+	{
+		DeleteIndex(IndexName);
+		bm_y.writeBackDisk(IndexName);
+	}
+
 }
 
 /********************************/

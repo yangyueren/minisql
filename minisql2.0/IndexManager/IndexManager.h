@@ -32,7 +32,7 @@ public:
 	bool InsertIntoIndex(string IndexName, string KeyValue, int Key_Type, OffsetType Offset);// string IndexName, string KeyValue, int Key_Type, OffsetType Offset
 	bool DeleteInIndex(string IndexName, string KeyValue, int Key_Type);
 	bool DeleteIndex(string IndexName);//在传入删除的索引文件名，在内存中删除索引头
-	void writeToDisk(string indexName);
+	void writeToDisk();
 	void levelListIndex(string IndexName, int Key_Type);
 private:
 	vector<struct Index> IndexSet;

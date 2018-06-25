@@ -39,7 +39,7 @@ int main(int argc,char * argv[])
 	im.DeleteInIndex(indexName, "9", 0);
 	im.DeleteInIndex(indexName, "8", 0);
 	im.levelListIndex(indexName, 0);
-	//im.writeToDisk();
+	im.writeToDisk();
 	int temp = im.SearchInIndex(indexName, "10", 0);
 	cout << temp << endl;
 	temp = im.SearchInIndex(indexName, "7", 0);
