@@ -51,7 +51,7 @@ int RecordManager::indexCreate(string indexName)
 //drop a index 的操作
 int RecordManager::indexDrop(string indexName)
 {
-	string filename = indexName;
+	string filename = "IndexFile_" +indexName;
 	if(remove(filename.c_str()))  //删除成功remove函数返回0
 		return 0;  //删除失败
 	return 1;  //删除成功
@@ -67,8 +67,10 @@ int RecordManager::insertRecord(string tableName, char* record, int recordSize)
 	//ask buffer the position
 	string filename = "TableFile_" + tableName;
 	int pos = -1;
+	int a =  -1;
 	pos = bm.getInsertPosition(filename, recordSize + 1);    
-
+	
+	//cout<<bm.bufferPool[pos].content<<endl;
 	//write record in
 	int use = 0;
 
@@ -78,13 +80,16 @@ int RecordManager::insertRecord(string tableName, char* record, int recordSize)
 		{
 			bm.bufferPool[pos].content[use] = no_empty;
 			memcpy(&bm.bufferPool[pos].content[use+1], record, recordSize);  //存入record
+			a = bm.bufferPool[pos].offsetInFile;
+			bm.setDirty(pos);
+			bm.writtenToDisk(pos);
 			break;
 		}
 		use = use + 1 + recordSize;
 	}
 
 
-	return pos; //insert is successful, 返回块号
+	return a; //insert is successful, 返回块号
 }
 
 
@@ -93,8 +98,10 @@ int RecordManager::insertRecord(string tableName, char* record, int recordSize)
 
 int RecordManager::showClearRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector, int in)  //bn是该table下的block数量，catelog提供
 {
+	string filename ="TableFile_" + tableName;
+	int s = bm.getBuffer(filename, in);
 
-	showBlockRecord(recordSize, in, attributeVector, conditionVector);
+	showBlockRecord(recordSize, s, attributeVector, conditionVector);
 		
 	return 1;
 }
@@ -135,7 +142,7 @@ int RecordManager::showBlockRecord(int recordSize, int num, vector<Attribute> &a
 			if (ifCondition(&bm.bufferPool[num].content[use+1], recordSize, attributeVector, conditionVector))
 			{
 				printRecord(&bm.bufferPool[num].content[use+1], recordSize, attributeVector);
-				count++;
+				count++; 
 			}				
 		}
 
@@ -144,6 +151,15 @@ int RecordManager::showBlockRecord(int recordSize, int num, vector<Attribute> &a
 	return count;
 }
 
+int RecordManager::searchClearRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector, int in)  //bn是该table下的block数量，catelog提供
+{
+	string filename ="TableFile_" + tableName;
+	int s = bm.getBuffer(filename, in);
+
+	searchBlockRecord(recordSize, s, attributeVector, conditionVector);
+		
+	return 1;
+}
 
 int RecordManager::searchRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector, vector<Condition> &conditionVector)  //bn是该table下的block数量，catelog提供
 {
@@ -191,8 +207,10 @@ int RecordManager::searchBlockRecord(int recordSize, int num, vector<Attribute> 
 int RecordManager::deleteClearRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector, int in)  //bn是该table下的block数量，catelog提供
 {
 
+	string filename ="TableFile_" + tableName;
+	int s = bm.getBuffer(filename, in);
 
-	deleteBlockRecord(recordSize, in, attributeVector, conditionVector);
+	deleteBlockRecord(recordSize, s, attributeVector, conditionVector);
 		
 	return 1;
 }
@@ -230,6 +248,7 @@ int RecordManager::deleteBlockRecord(int recordSize, int num, vector<Attribute> 
 			if (ifCondition(&bm.bufferPool[num].content[use+1], recordSize, attributeVector, conditionVector))
 			{
 				bm.bufferPool[num].content[use] = empty;
+				bm.setDirty(num); 
 				bm.writtenToDisk(num);
 				count ++;
 			}
@@ -279,6 +298,7 @@ int RecordManager::ifCondition(char* recordBegin, int recordSize, vector<Attribu
             	}
         	}
         }
+
         if(type == 0)
         {
         	typeSize = sizeof(int);
@@ -367,7 +387,7 @@ int indexNewCreate(string indexName, int )
 {
 
 }*/
-
+/* 
 int RecordManager::insertNewIndex(string tableName, string indexName, int recordSize, int bn, vector<Attribute> &attributeVector,int j)  //bn是该table下的block数量，catelog提供
 {
 	//先输出属性行
@@ -430,5 +450,7 @@ int RecordManager::insertNewBlockIndex(string indexName, int recordSize, int num
 		use = use + recordSize + 1;  //go to next record
 	}
 	return count;
-}
+}*/ 
+
+
 

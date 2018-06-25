@@ -29,6 +29,7 @@ public:
    //无索引查找
     int showRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector); //bn是这个表有几个块，输出所有符合条件的记录,返回值是记录数量
  
+    int searchClearRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector, int in); 
      int searchRecord(string tableName, int recordSize, int bn, vector<Attribute> &attributeVector,vector<Condition> &conditionVector);
     
     //删除记录
@@ -44,7 +45,7 @@ public:
 
 
     //插入索引
-    int insertNewIndex(string tableName, string indexName, int recordSize, int bn, vector<Attribute> &attributeVector,int j) ;
+   // int insertNewIndex(string tableName, string indexName, int recordSize, int bn, vector<Attribute> &attributeVector,int j) ;
     //更新记录
  //   int updateRecord(string tabaleName,int recordSize, vector<Condition> &conditionVector);
 
