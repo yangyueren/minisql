@@ -1,21 +1,22 @@
 #include <iostream>
-//#include "Interpreter.hpp"
-//#include "CatalogManager.h"
-//#include "RecordManager.h"
-#include "IndexManager.h"
-//#include "BufferManager_y.h"
 #include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "Interpreter.hpp"
+#include "CatalogManager.h"
+#include "RecordManager.h"
+#include "IndexManager.h"
+#include "API.h"
+#define QUIT -1
+#define EXEC_FILE 2
 
-//#include "API.h"
-
-
-
+clock_t start = 0;
+clock_t finish;
 
 int main(int argc,char * argv[])
 {
+<<<<<<< HEAD
 
 	string indexName = "im1.txt";
 	vector<int> re;
@@ -47,6 +48,55 @@ int main(int argc,char * argv[])
 	cout << temp << endl;
 	system("pause");
     
+=======
+    API api;
+    index_manager.CreateIndex("2", 15, 2, 15);
+    cout << "Welcome to the MiniSQL monitor. Commands end with ;" << endl;
+    cout << "Copyright (c) 2018 bds & jjc & syj & yyr & zzy. All rights reserved." << endl;
+    bool file_read = false;
+    ifstream file;
+    Interpreter interpreter;
+    interpreter.api = &api;
+    string s;
+    int status = 0;
+    while(1){
+        if(file_read == false){
+            cout<<"minisql> ";
+            getline(cin, s, ';');
+            start = clock();
+            status =  interpreter.interpreter(s);
+            if(status == EXEC_FILE){
+                file_read = true;
+            }
+            else if(status == QUIT){
+                cout << "Bye" << endl;
+                break;
+            }
+            else{
+                finish = clock();
+                double duration = (double)(finish - start) / CLOCKS_PER_SEC;
+                duration *= 1000;
+                printf("The duration is %2.1f ms\n", duration);
+            }
+        }
+        else{ // 读取文件
+            file.open(interpreter.file_name.c_str());
+            if(!file.is_open()){
+                cout << "Fail to open " << interpreter.file_name <<endl;
+                file_read = false;
+                continue;
+            }
+            while(getline(file, s, ';')){
+                interpreter.interpreter(s);
+            }
+            file.close();
+            file_read = false;
+            finish = clock();
+            double duration = (double)(finish - start) / CLOCKS_PER_SEC;
+            duration *= 1000;
+            printf("The duration is %2.1f ms\n", duration);
+        }
+    }
+>>>>>>> 4a3ff70c3f31151fbf549ec6ee440696a29a6f40
     return 0;
 }
-
