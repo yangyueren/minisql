@@ -34,12 +34,14 @@ public:
 	bool DeleteIndex(string IndexName);//在传入删除的索引文件名，在内存中删除索引头
 	void writeToDisk();
 	void levelListIndex(string IndexName, int Key_Type);
+	bool SearchInRange(string IndexName, int Key_Type, string min_KeyValue, bool isLeftEqual,
+		string max_KeyValue, bool isRightEqual, vector<int> &return_result);
 private:
 	vector<struct Index> IndexSet;
 	int IndexNum;
 };
 
-extern IndexManager im;
+extern IndexManager index_manager;
 
 
 

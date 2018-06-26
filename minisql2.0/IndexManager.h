@@ -41,7 +41,7 @@ private:
 	int IndexNum;
 };
 
-extern IndexManager im;
+extern IndexManager index_manager;
 
 
 

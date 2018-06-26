@@ -1,7 +1,7 @@
 #include "IndexManager.h"
 
 using namespace std;
-IndexManager im;
+IndexManager index_manager;
 
 IndexManager::IndexManager()
 {
@@ -84,6 +84,8 @@ bool IndexManager::CreateIndex(string IndexName, int KeySize, int Key_Type, int 
 	else if(Key_Type == FLOAT_TYPE)
 	{
 		BPlusTree<float> BPT(IndexName, KeySize, Key_Type, Degree);
+		createNewBlock(IndexName);
+		UpdateIndex(&BPT);
 		BPT.LeafHead = BPT.root = createNewBlock(IndexName);
 		UpdateIndex(&BPT);
 		Node<float> node(KeySize);
@@ -95,6 +97,8 @@ bool IndexManager::CreateIndex(string IndexName, int KeySize, int Key_Type, int 
 	else if(Key_Type == STRING_TYPE)
 	{
 		BPlusTree<string> BPT(IndexName, KeySize, Key_Type, Degree);
+		createNewBlock(IndexName);
+		UpdateIndex(&BPT);
 		BPT.LeafHead = BPT.root = createNewBlock(IndexName);
 		UpdateIndex(&BPT);
 		Node<string> node(KeySize);
@@ -278,7 +282,7 @@ void IndexManager::writeToDisk()
 {
 
 	string IndexName;	
-	IndexName == IndexSet[0].IndexFileName;		
+	IndexName = IndexSet[0].IndexFileName;		
 	if (IndexName != "")
 	{
 		DeleteIndex(IndexName);
@@ -308,7 +312,13 @@ void IndexManager::levelListIndex(string IndexName, int Key_Type)
 			index = i;
 			break;
 		}
-	IndexSet[i].B_Plus_Tree_int.Level_List();
+	if (Key_Type == INT_TYPE)
+		IndexSet[i].B_Plus_Tree_int.Level_List();
+
+	else if (Key_Type == FLOAT_TYPE)
+		IndexSet[i].B_Plus_Tree_float.Level_List();
+	else if (Key_Type == STRING_TYPE)
+		IndexSet[i].B_Plus_Tree_string.Level_List();
 
 }
 
