@@ -10,6 +10,7 @@ IndexManager::IndexManager()
 	temp.IndexFileName = "";
 	temp.Type = -1;
 	IndexSet.push_back(temp);
+	IndexSet.push_back(temp);
 }
 
 IndexManager::~IndexManager()
@@ -67,7 +68,7 @@ bool IndexManager::DeleteIndex(string IndexName)
 
 bool IndexManager::CreateIndex(string IndexName, int KeySize, int Key_Type, int Degree)
 {
-	
+	//Degree = 1000 / KeySize;
 	if(Key_Type == INT_TYPE)
 	{
 		BPlusTree<int> BPT(IndexName, KeySize, Key_Type, Degree);
@@ -120,8 +121,8 @@ bool IndexManager::CreateIndex(string IndexName, int KeySize, int Key_Type)
 {
 	int Degree;
 
-	//Degree = 1000/KeySize;
-	Degree = 5;
+	Degree = 1000/KeySize;
+	//Degree = 5;
 	return CreateIndex(IndexName, KeySize, Key_Type, Degree);
 }
 
@@ -162,6 +163,10 @@ OffsetType IndexManager::SearchInIndex(string IndexName, string KeyValue, int Ke
 		if(Key_Type == INT_TYPE)
 		{
 			exist = IndexSet[i].B_Plus_Tree_int.Search(stoi(KeyValue), offset);
+			if (exist == false)
+			{
+				return -1;
+			}
 			Node<int> node;
 			IndexSet[i].B_Plus_Tree_int.GetNode(node, offset);
 			data_offset = IndexSet[i].B_Plus_Tree_int.Get_Data_Address(stoi(KeyValue), node);
@@ -169,6 +174,10 @@ OffsetType IndexManager::SearchInIndex(string IndexName, string KeyValue, int Ke
 		else if(Key_Type == FLOAT_TYPE)
 		{
 			exist = IndexSet[i].B_Plus_Tree_float.Search(stof(KeyValue), offset);
+			if (exist == false)
+			{
+				return -1;
+			}
 			Node<float> node;
 			IndexSet[i].B_Plus_Tree_float.GetNode(node, offset);
 			data_offset = IndexSet[i].B_Plus_Tree_float.Get_Data_Address(stof(KeyValue), node);
@@ -176,6 +185,10 @@ OffsetType IndexManager::SearchInIndex(string IndexName, string KeyValue, int Ke
 		else if(Key_Type == STRING_TYPE)
 		{
 			exist = IndexSet[i].B_Plus_Tree_string.Search(KeyValue, offset);
+			if (exist == false)
+			{
+				return -1;
+			}
 			Node<string> node;
 			IndexSet[i].B_Plus_Tree_string.GetNode(node, offset);
 			data_offset = IndexSet[i].B_Plus_Tree_string.Get_Data_Address(KeyValue, node);
@@ -209,9 +222,6 @@ bool IndexManager::InsertIntoIndex(string IndexName, string KeyValue, int Key_Ty
 		bm_y.loadToArray(IndexName);
 		GetIndex(IndexName, Key_Type);
 
-		
-	/*	bm_y.loadToArray(IndexName);
-		GetIndex(IndexName, Key_Type);*/
 	}
 
 	for(i=0; i<IndexNum; i++)
@@ -229,8 +239,9 @@ bool IndexManager::InsertIntoIndex(string IndexName, string KeyValue, int Key_Ty
 		succeed = IndexSet[i].B_Plus_Tree_string.Insert(KeyValue, Offset);
 	else
 		succeed = false;
-	//}
-
+	
+	DeleteIndex(IndexName);
+	bm_y.writeBackDisk(IndexName);
 	return succeed;
 }
 
@@ -272,6 +283,9 @@ bool IndexManager::DeleteInIndex(string IndexName, string KeyValue, int Key_Type
 		succeed = IndexSet[i].B_Plus_Tree_string.Delete(KeyValue);
 	else
 		succeed = false;
+
+	DeleteIndex(IndexName);
+	bm_y.writeBackDisk(IndexName);
 	
 	return succeed;
 }

@@ -1369,6 +1369,7 @@ void BPlusTree<KeyType>::GetNode(Node<KeyType> & node, OffsetType offset)
 	BN = bf.getBlockByOffset(BPlusTree_name, offset);
 	BlockContent = bf.getContent(BN);*/
 	//BufferManager_y bm_y;
+	
 	BlockContent = bm_y.getBlockByOffset(BPlusTree_name, offset);
 	ParseNode(BlockContent, node);
 }
