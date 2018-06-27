@@ -1,0 +1,484 @@
+#include "IndexManager.h"
+
+using namespace std;
+IndexManager index_manager;
+
+IndexManager::IndexManager()
+{
+	IndexNum = 1;
+	struct Index temp;
+	temp.IndexFileName = "";
+	temp.Type = -1;
+	IndexSet.push_back(temp);
+	IndexSet.push_back(temp);
+}
+
+IndexManager::~IndexManager()
+{
+    writeToDisk();
+}
+
+bool IndexManager::GetIndex(string IndexName, int Key_Type)
+{
+	struct Index temp_index;
+
+	temp_index.Type = Key_Type;
+	temp_index.IndexFileName = IndexName;
+	temp_index.B_Plus_Tree_int.BPlusTree_name = IndexName;
+	if (Key_Type == INT_TYPE)
+	{
+		bm_y.loadToArray(temp_index.IndexFileName);
+		GetIndexHead(&temp_index.B_Plus_Tree_int);
+		used_byte = temp_index.B_Plus_Tree_int.used_byte_b;
+	}
+	else if (Key_Type == FLOAT_TYPE)
+	{
+		bm_y.loadToArray(temp_index.IndexFileName);
+		GetIndexHead(&temp_index.B_Plus_Tree_float);		
+		used_byte = temp_index.B_Plus_Tree_float.used_byte_b;
+	}
+	else if (Key_Type == STRING_TYPE)
+	{
+		bm_y.loadToArray(temp_index.IndexFileName);
+		GetIndexHead(&temp_index.B_Plus_Tree_string);
+		used_byte = temp_index.B_Plus_Tree_string.used_byte_b;
+	}
+	else
+		return false;
+
+	//IndexSet.insert(IndexSet.begin()+IndexNum, temp_index);
+	IndexSet.insert(IndexSet.begin(), temp_index);
+	//IndexNum++;
+	return true;
+}
+
+bool IndexManager::DeleteIndex(string IndexName)
+{
+	int i;
+	int index = -1;
+
+	for(i=0; i<IndexNum; i++)
+		if(IndexName == IndexSet[i].IndexFileName)
+		{
+			index = i;
+			
+			break;
+		}
+
+	if(index == -1)
+	{
+		//cout<<"No such index named "<<IndexName<<" ,Deletion failed!"<<endl;
+		return false;
+	}
+	else
+	{
+		IndexSet.erase(IndexSet.begin()+index);
+		used_byte = 0;
+		struct Index temp;
+		temp.IndexFileName = "";
+		temp.Type = -1;
+		IndexSet.insert(IndexSet.begin(), temp);
+		//IndexNum--;
+		//cout<<"Index "<<IndexName<<" has been deleted!"<<endl;
+		return true;
+	}
+}
+
+bool IndexManager::CreateIndex(string IndexName, int KeySize, int Key_Type, int Degree)
+{
+
+    
+    //OffsetType offset;
+    if (IndexSet[0].IndexFileName != IndexName)
+    {
+    
+        if (IndexSet[0].IndexFileName != "")
+        {
+            bm_y.writeBackDisk(IndexSet[0].IndexFileName);
+            DeleteIndex(IndexSet[0].IndexFileName);
+        }
+    }
+   
+    
+	if (Key_Type == INT_TYPE)
+	{
+		BPlusTree<int> BPT(IndexName, KeySize, Key_Type, Degree);
+		//createNewBlock(IndexName, BPT.used_bytes);
+		//UpdateIndex(&BPT);
+		BPT.used_byte_b = 2 * OffsetByte;
+		used_byte = BPT.used_byte_b;
+
+		BPT.LeafHead = BPT.root = 1;
+		UpdateIndex(&BPT);
+		Node<int> node(KeySize);
+		node.Self = BPT.root;
+		node.key_num = 0;
+		node.IsLeaf = true;
+		BPT.UpdateNode(node, node.Self);
+        used_byte = 2 * OffsetByte;
+		bm_y.writeBackDisk(IndexName);
+	}
+	else if (Key_Type == FLOAT_TYPE)
+	{
+		BPlusTree<float> BPT(IndexName, KeySize, Key_Type, Degree);
+		//createNewBlock(IndexName, BPT.used_bytes);
+		//UpdateIndex(&BPT);
+		BPT.used_byte_b = 2 * OffsetByte;
+		used_byte = BPT.used_byte_b;
+
+		BPT.LeafHead = BPT.root = 1;
+		UpdateIndex(&BPT);
+		Node<float> node(KeySize);
+		node.Self = BPT.root;
+		node.key_num = 0;
+		node.IsLeaf = true;
+		BPT.UpdateNode(node, node.Self);
+        used_byte = 2 * OffsetByte;
+		bm_y.writeBackDisk(IndexName);
+	}
+	else if (Key_Type == STRING_TYPE)
+	{
+		Degree = 3900 / (KeySize + 4);
+		if (Degree % 2 == 0)
+		{
+			Degree--;
+		}
+		
+		BPlusTree<string> BPT(IndexName, KeySize, Key_Type, Degree);
+		//createNewBlock(IndexName, BPT.used_bytes);
+		//UpdateIndex(&BPT);
+		BPT.used_byte_b = 2 * OffsetByte;
+		used_byte = BPT.used_byte_b;
+
+		BPT.LeafHead = BPT.root = 1;
+		UpdateIndex(&BPT);
+		Node<string> node(KeySize);
+		node.Self = BPT.root;
+		node.key_num = 0;
+		node.IsLeaf = true;
+		BPT.UpdateNode(node, node.Self);
+		used_byte = BPT.used_byte_b;
+        used_byte = 2 * OffsetByte;
+		bm_y.writeBackDisk(IndexName);
+	}
+	else
+		return false;
+
+	
+
+	return true;
+}
+
+
+bool IndexManager::CreateIndex(string IndexName, int KeySize, int Key_Type)
+{
+	int Degree;
+
+	Degree =4000/KeySize;
+	if (Degree % 2 == 0)
+	{
+		Degree--;
+	}
+	Degree = 501;
+	return CreateIndex(IndexName, KeySize, Key_Type, Degree);
+}
+
+
+OffsetType IndexManager::SearchInIndex(string IndexName, string KeyValue, int Key_Type)
+{
+	int i;
+	int index = -1;
+	OffsetType offset = -1;
+	OffsetType data_offset = -1;
+	bool exist = false;
+	if (IndexSet[0].IndexFileName != IndexName)
+	{
+		if (IndexSet[0].IndexFileName != "")
+		{
+			bm_y.writeBackDisk(IndexSet[0].IndexFileName);
+			DeleteIndex(IndexSet[0].IndexFileName);
+		}
+		bm_y.loadToArray(IndexName);
+		GetIndex(IndexName, Key_Type);
+
+	}
+
+	for(i=0; i<IndexNum; i++)
+		if(IndexName == IndexSet[i].IndexFileName)
+		{
+			index = i;
+			break;
+		}
+
+	if(index == -1)
+	{
+		//cout<<"No such index named "<<IndexName<<" ,Search failed!"<<endl;
+		return -1;
+	}
+	else
+	{
+		if(Key_Type == INT_TYPE)
+		{
+			exist = IndexSet[i].B_Plus_Tree_int.Search(stoi(KeyValue), offset);
+			if (exist == false)
+			{
+				return -1;
+			}
+			Node<int> node;
+			IndexSet[i].B_Plus_Tree_int.GetNode(node, offset);
+			data_offset = IndexSet[i].B_Plus_Tree_int.Get_Data_Address(stoi(KeyValue), node);
+		}
+		else if(Key_Type == FLOAT_TYPE)
+		{
+			exist = IndexSet[i].B_Plus_Tree_float.Search(stof(KeyValue), offset);
+			if (exist == false)
+			{
+				return -1;
+			}
+			Node<float> node;
+			IndexSet[i].B_Plus_Tree_float.GetNode(node, offset);
+			data_offset = IndexSet[i].B_Plus_Tree_float.Get_Data_Address(stof(KeyValue), node);
+		}
+		else if(Key_Type == STRING_TYPE)
+		{
+			exist = IndexSet[i].B_Plus_Tree_string.Search(KeyValue, offset);
+			if (exist == false)
+			{
+				return -1;
+			}
+			Node<string> node;
+			IndexSet[i].B_Plus_Tree_string.GetNode(node, offset);
+			data_offset = IndexSet[i].B_Plus_Tree_string.Get_Data_Address(KeyValue, node);
+		}
+		else
+			exist = false;
+	}
+
+	if(exist)
+		return data_offset;
+	else
+		return -1;
+}
+
+bool IndexManager::InsertIntoIndex(string IndexName, string KeyValue, int Key_Type, OffsetType Offset)
+{
+	int i;
+	int index = -1;
+	bool succeed = false;
+	bool exist = false;
+	//OffsetType offset;
+	if (IndexSet[0].IndexFileName != IndexName)
+	{
+
+	
+		if (IndexSet[0].IndexFileName != "")
+		{
+			bm_y.writeBackDisk(IndexSet[0].IndexFileName);
+			DeleteIndex(IndexSet[0].IndexFileName);
+		}
+		bm_y.loadToArray(IndexName);
+		GetIndex(IndexName, Key_Type);
+
+	}
+
+	for(i=0; i<IndexNum; i++)
+		if(IndexName == IndexSet[i].IndexFileName)
+		{
+			index = i;
+			break;
+		}
+
+	if (Key_Type == INT_TYPE)
+	{
+		succeed = IndexSet[i].B_Plus_Tree_int.Insert(stoi(KeyValue), Offset);
+		IndexSet[i].B_Plus_Tree_int.used_byte_b = used_byte;
+		UpdateIndex(&IndexSet[i].B_Plus_Tree_int);
+	}
+		
+	else if (Key_Type == FLOAT_TYPE)
+	{
+		succeed = IndexSet[i].B_Plus_Tree_float.Insert(stof(KeyValue), Offset);
+		IndexSet[i].B_Plus_Tree_float.used_byte_b = used_byte;
+		UpdateIndex(&IndexSet[i].B_Plus_Tree_float);
+	}
+	else if (Key_Type == STRING_TYPE)
+	{
+		succeed = IndexSet[i].B_Plus_Tree_string.Insert(KeyValue, Offset);
+		IndexSet[i].B_Plus_Tree_string.used_byte_b = used_byte;
+		UpdateIndex(&IndexSet[i].B_Plus_Tree_string);
+	}
+	else
+		succeed = false;	
+
+	//bm_y.writeBackDisk(IndexName);
+	//DeleteIndex(IndexName);
+	return succeed;
+}
+
+
+
+
+
+bool IndexManager::DeleteInIndex(string IndexName, string KeyValue, int Key_Type)
+{
+	int i;
+	int index = -1;
+	OffsetType offset = -1;
+	bool succeed = false;
+	bool exist = false;
+	if (IndexSet[0].IndexFileName != IndexName)
+	{
+		if (IndexSet[0].IndexFileName != "")
+		{
+			bm_y.writeBackDisk(IndexSet[0].IndexFileName);
+			DeleteIndex(IndexSet[0].IndexFileName);
+		}
+		bm_y.loadToArray(IndexName);
+		GetIndex(IndexName, Key_Type);
+
+	}
+
+	for(i=0; i<IndexNum; i++)
+		if(IndexName == IndexSet[i].IndexFileName)
+		{
+			index = i;
+			break;
+		}
+	if (Key_Type == INT_TYPE)
+	{
+		succeed = IndexSet[i].B_Plus_Tree_int.Delete(stoi(KeyValue));
+		UpdateIndex(&IndexSet[i].B_Plus_Tree_int);
+	}
+
+	else if (Key_Type == FLOAT_TYPE)
+	{
+		succeed = IndexSet[i].B_Plus_Tree_float.Delete(stof(KeyValue));
+		UpdateIndex(&IndexSet[i].B_Plus_Tree_float);
+	}
+	else if (Key_Type == STRING_TYPE)
+	{
+		succeed = IndexSet[i].B_Plus_Tree_string.Delete(KeyValue);
+		UpdateIndex(&IndexSet[i].B_Plus_Tree_string);
+	}
+	else
+		succeed = false;
+
+	bm_y.writeBackDisk(IndexName);
+	DeleteIndex(IndexName);
+
+	return succeed;
+}
+
+
+
+void IndexManager::writeToDisk()
+{
+
+	string IndexName;	
+	IndexName = IndexSet[0].IndexFileName;		
+	if (IndexName != "")
+	{
+		
+		bm_y.writeBackDisk(IndexName);
+		DeleteIndex(IndexName);
+	}
+
+}
+
+/********************************/
+void IndexManager::levelListIndex(string IndexName, int Key_Type)
+{
+	int i = 0;
+	int index = 0;
+	if (IndexSet[0].IndexFileName != IndexName)
+	{
+		if (IndexSet[0].IndexFileName != "")
+		{
+			bm_y.writeBackDisk(IndexSet[0].IndexFileName);
+		}
+		bm_y.loadToArray(IndexName);
+		GetIndex(IndexName, Key_Type);
+
+	}
+	for (i = 0; i<IndexNum; i++)
+		if (IndexName == IndexSet[i].IndexFileName)
+		{
+			index = i;
+			break;
+		}
+	if (Key_Type == INT_TYPE)
+		IndexSet[i].B_Plus_Tree_int.Level_List();
+
+	else if (Key_Type == FLOAT_TYPE)
+		IndexSet[i].B_Plus_Tree_float.Level_List();
+	else if (Key_Type == STRING_TYPE)
+		IndexSet[i].B_Plus_Tree_string.Level_List();
+
+}
+
+bool IndexManager::SearchInRange(string IndexName, int Key_Type, string min_KeyValue, bool isLeftEqual,
+	string max_KeyValue, bool isRightEqual,  vector<int> &return_result)
+{
+	int i;
+	int index = -1;
+
+	bool exist = false;
+	if (IndexSet[0].IndexFileName != IndexName)
+	{
+		if (IndexSet[0].IndexFileName != "")
+		{
+			bm_y.writeBackDisk(IndexSet[0].IndexFileName);
+			DeleteIndex(IndexSet[0].IndexFileName);
+		}
+		bm_y.loadToArray(IndexName);
+		GetIndex(IndexName, Key_Type);
+
+	}
+
+	for (i = 0; i<IndexNum; i++)
+		if (IndexName == IndexSet[i].IndexFileName)
+		{
+			index = i;
+			break;
+		}
+
+	if (index == -1)
+	{
+		//cout<<"No such index named "<<IndexName<<" ,Search failed!"<<endl;
+		return -1;
+	}
+	else
+	{
+		if (Key_Type == INT_TYPE)
+		{
+			IndexSet[i].B_Plus_Tree_int.SearchRange(stoi(min_KeyValue), isLeftEqual, stoi(max_KeyValue), isRightEqual, return_result);
+			if (return_result[0] > 0)
+			{
+				exist = true;
+			}
+		}
+		else if (Key_Type == FLOAT_TYPE)
+		{
+			IndexSet[i].B_Plus_Tree_float.SearchRange(stof(min_KeyValue), isLeftEqual, stof(max_KeyValue), isRightEqual, return_result);
+			if (return_result[0] > 0)
+			{
+				exist = true;
+			}
+		}
+		else if (Key_Type == STRING_TYPE)
+		{
+			IndexSet[i].B_Plus_Tree_string.SearchRange(min_KeyValue, isLeftEqual, max_KeyValue, isRightEqual, return_result);
+			if (return_result[0] > 0)
+			{
+				exist = true;
+			}
+		}
+		else
+			exist = false;
+	}
+
+	if (exist)
+		return true;
+	else
+		return -1;
+}
